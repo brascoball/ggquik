@@ -1,0 +1,101 @@
+
+#' Replace ggplot scale breaks with only limits
+#'
+#' This is a function containing a function that will take
+#' the given breaks for a continuous scale and returns only
+#' the limits based on the data. Currently only used as a
+#' sub function for \code{\link{quik_bullets}}
+#'
+#'
+#' @export
+use_limits = function() {
+  function(x) c(min(x)+diff(range(x))*0.05/1.1,
+                max(x)-diff(range(x))*0.05/1.1)
+}
+
+
+#' Flip Levels of a factor
+#'
+#' Sometimes plots require levels to be reversed. This function will flip the order
+#' of factors.
+#'
+#' @param data_frame_column The column in your data frame to reverse the levels
+#'
+#' @usage flip_levels(data_frame_column)
+#'
+#' @return A column to be added to a dataframe
+#'
+#' @export
+flip_levels = function(data_frame_column) {
+  return(factor(data_frame_column, levels = rev(levels(data_frame_column))))
+}
+
+
+#' Expand the yearmon into a factor
+#'
+#' This will add in any missing dates with zeroes, then change the yearmon
+#' dimension into a factor so that it can be used in order like all other
+#' factor dimensions.
+#'
+#' @importFrom data.table data.table := CJ
+#'
+#' @param df The data frame to update the dimension
+#' @param dimension The column containing the values to compare across (e.g. quarters, types)
+#' @param measure The data frame column with the numerical values to plot
+#' @param facet_by The data frame column with the facet data (if necessary).
+#'
+#' @usage factor_yearmon(df, dimension, measure, facet_by)
+#'
+#' @export
+factor_yearmon = function(df, dimension, measure, facet_by) {
+  dt <- data.table(df)
+  all_yearmon = seq(min(dt[, get(dimension)]), max(dt[, get(dimension)]), 1/12)
+  if(!is.null(facet_by)) {
+    grid <- CJ(all_yearmon, dt[, get(facet_by)], unique = TRUE)
+    names(grid) <- c(dimension, facet_by)
+    dt <- merge(grid, dt, all.x = TRUE)
+    dt[is.na(get(measure)), (measure) := 0]
+  }
+  df <- data.frame(dt)
+  df[, dimension] <- factor(format(df[, dimension], "%b %y"), levels = format(all_yearmon, "%b %y"))
+  return(df)
+}
+
+
+#' Set the decimal for the plot text
+#'
+#' @param measure The df column to be plotted
+#' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
+#'
+#' @usage set_decimal(measure, measure_unit)
+#'
+#' @export
+set_decimal = function(measure, measure_unit) {
+  measure_decimal = 0
+  if (mean(measure) < 10) {
+    if (is.null(measure_unit)) { measure_decimal = 1 }
+    else if (measure_unit != '%') { measure_decimal = 1 }
+  }
+  return(measure_decimal)
+}
+
+
+#' Quik save a quik plot as a png file
+#'
+#' @import ggplot2
+#'
+#' @param gg The ggplot to be themed
+#' @param dir The directory to which the plot will be saved
+#' @param filename The new filename for the plot
+#' @param width The width of the png (best between 4 and 6)
+#' @param height The height of the png (best between 2 and 5)
+#'
+#' @usage quiksave(gg, dir, filename, width, height)
+#'
+#' @export
+quiksave = function(gg, dir, filename, width=6, height=4.5) {
+  gg <- ggplot_gtable(ggplot_build(gg))
+  gg$layout$clip[gg$layout$name == "panel"] <- "off"
+  cowplot::ggsave(paste0(dir, filename, ".png"), gg, bg='transparent', width=width, height=height)
+}
+
