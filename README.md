@@ -3,10 +3,10 @@
 
 Using ggplot2, create quick bar, line, and bullet plots using standardized layouts and Red Hat color schemes.
 
-In order to install ggquik,
+In order to install ggquik:
 
 ``` R
 # Install the development version from GitHub:
 # install.packages("devtools")
-devtools::install_github("brascoball/hattyr") 
+devtools::install_github("brascoball/ggquik") 
 ```
