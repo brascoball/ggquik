@@ -32,7 +32,7 @@ set_group_colors = function(group_column, palette_type, color_names = NULL) {
   }
   if (palette_type == 'diverging') {
     if (gr_nums <= 2) fill.colors <-  c(plot_colors$positive, plot_colors$negative)
-    else fill.colors <- c(plot_colors$positive, redhat_colors(paste("Gray", 4:(1+gr_nums))), plot_colors$negative)
+    else fill.colors <- c(plot_colors$positive, rev(redhat_colors(paste("Gray", 4:(1+gr_nums)))), plot_colors$negative)
   } else if (palette_type == 'sequential') {
     fill.colors <- redhat_colors(color_names, partial = TRUE)
     fill.colors <- fill.colors[order(fill.colors)]

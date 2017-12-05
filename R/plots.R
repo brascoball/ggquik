@@ -88,7 +88,8 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
   }
   gg <- gg + scale_fill_manual(values=fill.colors) + guides(fill=guide_legend(reverse = TRUE))
   if (!is.null(alt_label)) {
-    y.expand <- waiver()
+    # y.expand <- waiver()
+    y.expand <- expand_scale(mult = c(0, .1))
     gg <- gg + geom_text(data=unique(df[, c(dimension, facet_by, 'alt_label')]),
                          aes_string(y = alt.pos, label = 'alt_label'), hjust = h.just,
                          color = txt.d, family = 'Overpass', size = alt_text_size)
