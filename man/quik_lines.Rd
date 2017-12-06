@@ -6,7 +6,7 @@
 \usage{
 quik_lines(df, dimension, measure, line_groups, palette_type,
                         line_colors, point_size, dim_breaks,
-                        facet_col, label_size,
+                        facet_col, area, label_size,
                         currency, measure_unit, measure_decimal,
                         baseline)
 }
@@ -28,6 +28,8 @@ quik_lines(df, dimension, measure, line_groups, palette_type,
 \item{dim_breaks}{A vector of specific dimension values that should be labeled.}
 
 \item{facet_col}{The column containing the group to facet the plots (if desired).}
+
+\item{area}{A logical. Should the plot be drawn as an area plot?}
 
 \item{label_size}{The size of the label text size. Default is 3}
 

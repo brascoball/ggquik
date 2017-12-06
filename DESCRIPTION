@@ -1,7 +1,7 @@
 Package: ggquik
 Type: Package
 Title: Quick Plotting ggplot2 Wrapper
-Version: 0.1.0.1
+Version: 0.1.0.2
 Author: Don Chesworth
 Maintainer: Don Chesworth <dcheswor@redhat.com>
 Description: Using ggplot2, create quick bar, line, and bullet plots
@@ -9,7 +9,7 @@ Description: Using ggplot2, create quick bar, line, and bullet plots
 License: BSD_3_clause + file LICENSE
 Imports:
     data.table (>= 1.10.4),
-    ggplot2 (>= 2.2.1),
+    ggplot2 (>= 2.2.1.9000),
     cowplot (>= 0.7.0), 
     scales (>= 0.5.0)
 Depends: R(>= 2.10)

@@ -166,9 +166,11 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   if (area) {
     gg <- gg + geom_area(aes_string(fill = line_groups), alpha = 0.6)
     p.pos <- position_stack()
+    t.pos <- "identity"
   } else {
     gg <- gg + geom_line(aes_string(color = line_groups))
     p.pos <- "identity"
+    t.pos <- "identity"
   }
   # add baseline (must be after adding lines or else odd error)
   if (!is.null(baseline)) gg <- add_baseline(gg, baseline[1], as.numeric(baseline[2]))
@@ -193,7 +195,8 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   }
   gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   # add text labels
-  gg <- gg + geom_text(family = 'Overpass', size = 3.25, label = df$measure_label, vjust = -0.5, color = txt.d)
+  gg <- gg + geom_text(family = 'Overpass', size = 3.25, position = t.pos,
+                       label = df$measure_label, vjust = -0.5, color = txt.d)
   return(gg)
 }
 
