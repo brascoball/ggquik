@@ -163,12 +163,18 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
     l_legend = 'legend'
   }
   # add lines or area:
-  if (area) gg <- gg + geom_area(aes_string(fill = line_groups), alpha = 0.6)
-  else gg <- gg + geom_line(aes_string(color = line_groups))
+  if (area) {
+    gg <- gg + geom_area(aes_string(fill = line_groups), alpha = 0.6)
+    p.pos <- position_stack()
+  } else {
+    gg <- gg + geom_line(aes_string(color = line_groups))
+    p.pos <- "identity"
+  }
   # add baseline (must be after adding lines or else odd error)
   if (!is.null(baseline)) gg <- add_baseline(gg, baseline[1], as.numeric(baseline[2]))
   # add points
-  if (point_size > 0) gg <- gg + geom_point(aes_string(color = line_groups), size = point_size)
+  if (point_size > 0) gg <- gg + geom_point(aes_string(color = line_groups), size = point_size,
+                                            position = p.pos)
   # split to facets if needed
   if (!is.null(facet_col)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_col)), scales = 'free', ncol = 1)
   # add colors
