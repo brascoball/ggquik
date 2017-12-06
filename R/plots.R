@@ -37,7 +37,7 @@
 #'
 #' @export
 quik_bars = function(df, dimension, measure, bar_groups = NULL,
-                       text_size = 3, alt_text_size = 3, alt_label = NULL, facet_by = NULL, background = FALSE,
+                       text_size = 3, alt_text_size = 4, alt_label = NULL, facet_by = NULL, background = FALSE,
                        flip_plot = FALSE, dim_breaks = NULL, palette_type = 'qualitative', bar_colors = NULL,
                        currency = NULL, measure_unit = NULL, measure_decimal = NULL,
                        v.just = 0.5, text_cutoff = 0, ...) {
@@ -96,11 +96,14 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
   } else {
     y.expand <- c(0, 0)
   }
-  y.labels = waiver()
+  y.labels = y.breaks = waiver()
   if (!is.null(measure_unit)) {
-    if (measure_unit == '%') y.labels = scales::percent
+    if (measure_unit == '%') {
+      y.labels = scales::percent
+      y.breaks = c(0, .25, .5, .75, 1)
+    }
   }
-  gg <- gg + scale_y_continuous(labels = y.labels, expand = y.expand)
+  gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   return(gg)
 }
 
@@ -122,6 +125,7 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
 #' @param point_size A numeric. The size of the points (default is \code{0}, no points)
 #' @param dim_breaks A vector of specific dimension values that should be labeled.
 #' @param facet_col The column containing the group to facet the plots (if desired).
+#' @param area A logical. Should the plot be drawn as an area plot?
 #' @param label_size The size of the label text size. Default is 3
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
@@ -132,17 +136,18 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
 #'
 #' @usage quik_lines(df, dimension, measure, line_groups, palette_type,
 #'                         line_colors, point_size, dim_breaks,
-#'                         facet_col, label_size,
+#'                         facet_col, area, label_size,
 #'                         currency, measure_unit, measure_decimal,
 #'                         baseline)
 #'
 #' @export
 quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'qualitative',
                         line_colors = NULL, point_size = 0, dim_breaks = NULL,
-                        facet_col = NULL, label_size = 3,
+                        facet_col = NULL, area = FALSE, label_size = 3,
                         currency = NULL, measure_unit = NULL, measure_decimal = 0,
                         baseline = NULL) {
   # add additional formatted columns
+  txt.d <- ggquik::plot_colors$text.dark
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
                      currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
   # create initial plot
@@ -157,8 +162,9 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
     # fill.colors <- redhat_colors(line_colors, partial = TRUE)
     l_legend = 'legend'
   }
-  # add lines
-  gg <- gg + geom_line(aes_string(color = line_groups))
+  # add lines or area:
+  if (area) gg <- gg + geom_area(aes_string(fill = line_groups), alpha = 0.6)
+  else gg <- gg + geom_line(aes_string(color = line_groups))
   # add baseline (must be after adding lines or else odd error)
   if (!is.null(baseline)) gg <- add_baseline(gg, baseline[1], as.numeric(baseline[2]))
   # add points
@@ -167,18 +173,21 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   if (!is.null(facet_col)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_col)), scales = 'free', ncol = 1)
   # add colors
   gg <- gg + scale_color_manual(values=fill.colors, guide = l_legend)
+  if (area) gg <- gg + scale_fill_manual(values=fill.colors, guide = FALSE)
   # add dimension breaks if necessary
   if (!is.null(dim_breaks)) {
-    gg <- gg + scale_x_discrete(breaks = unique(df[,dimension])[dim_breaks], drop = FALSE)
-    df[df[, dimension] != df[, dimension][dim_breaks],]$measure_label <- NA
+    x.breaks = unique(df[,dimension])[dim_breaks]
+    gg <- gg + scale_x_discrete(breaks = x.breaks, drop = FALSE)
+    df[!(df[, dimension] %in% x.breaks), 'measure_label'] <- NA
   }
-  y.labels = waiver()
+  y.breaks = y.labels = waiver()
+  y.expand <- expand_scale(mult = c(0.05, 0.05))
   if (!is.null(measure_unit)) {
     if (measure_unit == '%') y.labels = scales::percent
   }
-  gg <- gg + scale_y_continuous(labels = y.labels, expand = c(0,0))
+  gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   # add text labels
-  gg <- gg + geom_text(family = 'Overpass', size = 3.25, label = df$measure_label, vjust = -0.5)
+  gg <- gg + geom_text(family = 'Overpass', size = 3.25, label = df$measure_label, vjust = -0.5, color = txt.d)
   return(gg)
 }
 

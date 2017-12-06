@@ -120,7 +120,7 @@ quik_prepare = function(df, dimension, measure, plot_type, facet_by = NULL, back
   dt <- data.table(df)
   if (plot_type == 'bar')  dt[, position_text := cumsum(get(measure)) - (0.5 * get(measure)), by = c(dimension, facet_by)]
   if (!is.null(sum_label)) {
-    dt[, alt_label := format(sum(eval(as.name(sum_label))), big.mark=","), by = c(dimension)]
+    dt[, alt_label := format(sum(eval(as.name(sum_label))), big.mark=","), by = c(dimension, facet_by)]
     setorderv(dt, alt_label)
     dt$alt_label <- factor(dt$alt_label, levels = unique(dt$alt_label))
   }

@@ -93,10 +93,10 @@ quik_clean_grid = function(gg, grid.lines = NULL) {
   blnk <- element_blank()
   gg <- gg +
     theme(panel.background = element_blank(),
-          panel.grid.minor = element_blank(),
+          panel.spacing = unit(0, "cm"),
           axis.line = element_blank(),
           axis.ticks=element_blank())
-  gg <- gg + theme(panel.grid.major = blnk)
+  gg <- gg + theme(panel.grid.major = blnk, panel.grid.minor = blnk)
   if ('x' %in% grid.lines) gg <- gg + theme(panel.grid.major.x = lne)
   if ('y' %in% grid.lines) gg <- gg + theme(panel.grid.major.y = lne)
   return(gg)
@@ -136,7 +136,10 @@ quik_clean_facet = function(gg) {
 quik_legend = function(gg, legend_position) {
     gg <- gg +
       theme(legend.position=legend_position, legend.justification="center",
+            legend.margin=margin(-0.2, 0, 0, 0, unit='cm'),
+            # panel.background = element_rect(color = 'black'),
             legend.key.height=unit(0.5,"line"), legend.key.width=unit(1,"line"),
+            # panel.margin = unit(x = c(0.5, 0.5, 0.5, 0.5), "cm"),
             legend.title=element_blank(),
             legend.text=element_text(family = "Overpass",
                                      color = ggquik::plot_colors$text.color, size=10))
@@ -155,6 +158,7 @@ quik_legend = function(gg, legend_position) {
 quik_transparent = function(gg) {
   gg <- gg +
     theme(legend.key=element_rect(fill = "transparent", color = NA),
+          # legend.background =  element_rect(colour = 'black', size = 1, linetype='dashed'),
           legend.background=element_rect(fill = "transparent", color = NA),
           plot.background=element_rect(fill = "transparent", color = NA))
   return(gg)
