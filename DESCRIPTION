@@ -1,7 +1,7 @@
 Package: ggquik
 Type: Package
 Title: Quick Plotting ggplot2 Wrapper
-Version: 0.1.0.2
+Version: 0.1.0.3
 Author: Don Chesworth
 Maintainer: Don Chesworth <dcheswor@redhat.com>
 Description: Using ggplot2, create quick bar, line, and bullet plots
@@ -15,3 +15,4 @@ Imports:
 Depends: R(>= 2.10)
 RoxygenNote: 5.0.1
 LazyData: TRUE
+Remotes: tidyverse/ggplot2
