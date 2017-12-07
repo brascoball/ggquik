@@ -54,3 +54,26 @@ quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 ![](man/figures/README-quik_lines1.png)
 
 
+### quik_bullets()
+This is a more manual plot, but is helpful for things like key performance indicators (KPIs). It requires a dataset, `group`, `range_low`, `range_high`, and measure (`bar_fill`, `dotted_line`, or `solid_line`). For example you could just use a solid line:
+
+``` R
+df <- data.frame(
+  group = factor(c('Reliability', 'Accuracy', 'Uptime', 'Efficiency')),
+  dotted = sample(90:100, 4), solid = sample(80:100, 4),
+  fill = sample(80:100, 4), low = c(50, 75, 80, 80), high = rep(100, 4)
+)
+ggq <- quik_bullets(df, group_col = 'group', range_low = 'low', range_high = 'high',
+                    solid_line = 'solid')
+quik_theme(ggq, axis.text = 'x')
+```
+
+Or, you could use all three:
+
+``` R
+ggq <- quik_bullets(df, group_col = 'group', range_low = 'low', range_high = 'high',
+                    solid_line = 'solid', dotted_line = 'dotted', bar_fill = 'fill')
+quik_theme(ggq, axis.text = 'x')
+```
+
+![](man/figures/README-quik_bullets1.png)
