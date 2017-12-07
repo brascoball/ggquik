@@ -1,3 +1,19 @@
+#' Set Overpass as the quik family font
+#'
+#' This is a function will download the Overpass font from
+#' \url{https://fonts.google.com/} if necessary, then set it as 
+#' the font using showtext.
+#'
+#' @import sysfonts
+#' @import showtext
+#'
+#' @export
+set_quik_family = function() {
+  if (!("Overpass" %in% font_families())) font_add_google("Overpass", "Overpass")
+  showtext_auto()
+  return("Overpass")
+}
+
 
 #' Replace ggplot scale breaks with only limits
 #'

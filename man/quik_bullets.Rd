@@ -6,7 +6,7 @@
 \usage{
 quik_bullets(df, group_col, range_low, range_high, bar_fill,
                         dotted_line, solid_line, label_size,
-                        palette_type, bar_colors,
+                        palette_type, line_colors,
                         currency, measure_unit, ...)
 }
 \arguments{
@@ -27,9 +27,9 @@ quik_bullets(df, group_col, range_low, range_high, bar_fill,
 \item{label_size}{The size of the label text size. Default is 3}
 
 \item{palette_type}{A string. Allowed values are \code{"diverging"},
-\code{"sequential"}, and \code{"qualitative"}.}
+\code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.}
 
-\item{bar_colors}{A string. What color should be used for the bars (e.g.
+\item{line_colors}{A string. What color should be used for the lines (e.g.
 "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
 "green", "purple", "teal")}
 
@@ -45,5 +45,16 @@ ggquik has specific standards for plots, and
 \url{http://en.wikipedia.org/wiki/Bullet_graph} is a bar plot with
 additional progress indicators. None are required, but the options
 are a partial fill, a dotted line, and a solid line.
+}
+\examples{
+# load a sample data frame
+df <- data.frame(group = factor(c('Reliability', 'Accuracy', 'Uptime', 'Efficiency')),
+                  dotted = sample(90:100, 4), solid = sample(80:100, 4),
+                  fill = sample(80:100, 4), low = c(50, 75, 80, 80), high = rep(100, 4))
+# create a plot
+ggq <- quik_bullets(df, group_col = 'group', range_low = 'low', range_high = 'high',
+                    bar_fill = 'fill', solid_line = 'solid', dotted_line = 'dotted')
+quik_theme(ggq, axis.text = 'x')
+
 }
 

@@ -34,6 +34,12 @@
 #'                   flip_plot, dim_breaks, palette_type, bar_colors,
 #'                   currency, measure_unit, measure_decimal,
 #'                   v.just, text_cutoff, ...)
+#'                   
+#' @examples 
+#' # Create a bar plot from morley data
+#' data(morley)
+#' ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', bar_groups = 'Expt')
+#' quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 #'
 #' @export
 quik_bars = function(df, dimension, measure, bar_groups = NULL,
@@ -83,7 +89,7 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
     fill.colors <- rev(fill.colors)
   }
   if (text_size > 0) {
-    gg <- gg + geom_text(aes_string(y = 'position_text', label = 'measure_label'), family="Overpass",
+    gg <- gg + geom_text(aes_string(y = 'position_text', label = 'measure_label'), family=set_quik_family(),
                 color=txt.l, size = text_size, vjust = v.just)
   }
   gg <- gg + scale_fill_manual(values=fill.colors) + guides(fill=guide_legend(reverse = TRUE))
@@ -92,7 +98,7 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
     y.expand <- expand_scale(mult = c(0, .1))
     gg <- gg + geom_text(data=unique(df[, c(dimension, facet_by, 'alt_label')]),
                          aes_string(y = alt.pos, label = 'alt_label'), hjust = h.just,
-                         color = txt.d, family = 'Overpass', size = alt_text_size)
+                         color = txt.d, family = set_quik_family(), size = alt_text_size)
   } else {
     y.expand <- c(0, 0)
   }
@@ -140,6 +146,13 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
 #'                         facet_col, area, label_size,
 #'                         currency, measure_unit, measure_decimal,
 #'                         baseline)
+#'
+#' @examples 
+#' # Create a line plot from morley data
+#' data(morley)
+#' ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', 
+#'                  line_groups = 'Expt', label_size = 0)
+#' quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 #'
 #' @export
 quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'qualitative',
@@ -197,7 +210,7 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   }
   gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   # add text labels
-  if(label_size > 0) gg <- gg + geom_text(family = 'Overpass', size = label_size, position = t.pos,
+  if(label_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = label_size, position = t.pos,
                        label = df$measure_label, vjust = -0.5, color = txt.d)
   return(gg)
 }
@@ -232,8 +245,18 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
 #'
 #' @usage quik_bullets(df, group_col, range_low, range_high, bar_fill,
 #'                         dotted_line, solid_line, label_size,
-#'                         palette_type, bar_colors,
+#'                         palette_type, line_colors,
 #'                         currency, measure_unit, ...)
+#'                         
+#' @examples
+#' # load a sample data frame
+#' df <- data.frame(group = factor(c('Reliability', 'Accuracy', 'Uptime', 'Efficiency')),
+#'                   dotted = sample(90:100, 4), solid = sample(80:100, 4),
+#'                   fill = sample(80:100, 4), low = c(50, 75, 80, 80), high = rep(100, 4))
+#' # create a plot
+#' ggq <- quik_bullets(df, group_col = 'group', range_low = 'low', range_high = 'high',
+#'                     bar_fill = 'fill', solid_line = 'solid', dotted_line = 'dotted')
+#' quik_theme(ggq, axis.text = 'x')
 #'
 #' @export
 quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
@@ -255,12 +278,12 @@ quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
   if (!is.null(solid_line)) {
     gg <- gg + geom_errorbar(aes_string(ymin = solid_line, ymax = solid_line), width = 0.5, size = 1) +
       geom_text(aes_string(y = solid_line, label = paste0(solid_line, '_label')),
-                vjust = -4, color = txt.d, family = 'Overpass', size = 4)
+                vjust = -4, color = txt.d, family = set_quik_family(), size = 4)
   }
   if (!is.null(dotted_line)) {
     gg <- gg + geom_errorbar(aes_string(ymin = dotted_line, ymax = dotted_line), width = 0.5, size = 1, linetype = 'dashed') +
       geom_text(aes_string(y = dotted_line, label = paste0(dotted_line, '_label')),
-              vjust = -4, color = txt.d, family = 'Overpass', size = 4)
+              vjust = -4, color = txt.d, family = set_quik_family(), size = 4)
   }
   gg <- gg + coord_flip() + facet_wrap(~group, scales = 'free', ...)
   y.labels = waiver()

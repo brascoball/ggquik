@@ -19,7 +19,8 @@ quik_lines(df, dimension, measure, line_groups, palette_type,
 
 \item{line_groups}{The column containing the different groups of lines}
 
-\item{palette_type}{A string. Allowed values are \code{"diverging"},}
+\item{palette_type}{A string. Allowed values are \code{"diverging"},
+\code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.}
 
 \item{line_colors}{The the colors to be used for the line(s)/point(s)}
 
@@ -46,5 +47,13 @@ For example, \code{c('x', 5)}.}
 \description{
 ggquik has specific standards for plots, and
 \code{quik_lines} helps your plot follow these.
+}
+\examples{
+# Create a line plot from morley data
+data(morley)
+ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', 
+                 line_groups = 'Expt', label_size = 0)
+quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
+
 }
 

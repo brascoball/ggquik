@@ -37,7 +37,7 @@ quik_theme(ggq)
 And, if you want to keep the axis tick labels (`axis.text`) titles (`axis.title`):
 
 ``` R
-quik_theme(ggq, axis.text = c('y'), axis.title = c('x', 'y'))
+quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 ```
 
 ![](man/figures/README-quik_bars3.png)

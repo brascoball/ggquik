@@ -56,4 +56,11 @@ quik_bars(df, dimension, measure, bar_groups,
 ggquik has specific standards for plots, and
 \code{quik_bars} helps your plot follow these.
 }
+\examples{
+# Create a bar plot from morley data
+data(morley)
+ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', bar_groups = 'Expt')
+quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
+
+}
 
