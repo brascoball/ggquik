@@ -121,6 +121,7 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
 #' @param measure The column containing numerical values to be plotted
 #' @param line_groups The column containing the different groups of lines
 #' @param palette_type A string. Allowed values are \code{"diverging"},
+#' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
 #' @param line_colors The the colors to be used for the line(s)/point(s)
 #' @param point_size A numeric. The size of the points (default is \code{0}, no points)
 #' @param dim_breaks A vector of specific dimension values that should be labeled.
@@ -221,8 +222,8 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
 #' @param solid_line The column with the solid line distance (if needed)
 #' @param label_size The size of the label text size. Default is 3
 #' @param palette_type A string. Allowed values are \code{"diverging"},
-#' \code{"sequential"}, and \code{"qualitative"}.
-#' @param bar_colors A string. What color should be used for the bars (e.g.
+#' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
+#' @param line_colors A string. What color should be used for the lines (e.g.
 #' "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
 #' "green", "purple", "teal")
 #' @param currency A string, usually \code{$}
@@ -235,17 +236,16 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
 #'                         currency, measure_unit, ...)
 #'
 #' @export
-quik_bullets = function(df, group_col, range_low, range_high, bar_fill,
+quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
                           dotted_line = NULL, solid_line = NULL, label_size = 3,
-                          palette_type = NULL, bar_colors = "Purple",
+                          palette_type = 'qualitative', line_colors = "Purple",
                           currency = NULL, measure_unit = NULL, ...) {
   measures <- names(df)[names(df) %in% c(range_low, range_high, bar_fill, solid_line, dotted_line)]
   labels.df <- df[, measures]
   df[, paste0(measures, '_label')] <- sapply(labels.df, format_label, currency = currency, measure_unit = measure_unit)
   bar.color <- ggquik::plot_colors$grid.color
   fill.color <- change_shade(bar.color, -4)
-  group.colors <- set_group_colors(df[, group_col], palette_type, bar_colors)
-  print(group.colors)
+  group.colors <- set_group_colors(df[, group_col], palette_type, line_colors)
   txt.d <- ggquik::plot_colors$text.dark
   gg <- ggplot(df, aes_string(x = group_col, group = group_col, color = group_col))
   if (!is.null(bar_fill)) gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = bar_fill),
@@ -263,11 +263,11 @@ quik_bullets = function(df, group_col, range_low, range_high, bar_fill,
               vjust = -4, color = txt.d, family = 'Overpass', size = 4)
   }
   gg <- gg + coord_flip() + facet_wrap(~group, scales = 'free', ...)
-  if (measure_unit == '%') {
-    gg <- gg + scale_y_continuous(breaks = use_limits(), labels = scales::percent)
-  } else {
-    gg <- gg + scale_y_continuous(breaks = use_limits())
+  y.labels = waiver()
+  if (!is.null(measure_unit)) {
+    if (measure_unit == '%') y.labels = scales::percent
   }
+  gg <- gg + scale_y_continuous(breaks = use_limits(), labels = y.labels)
   gg <- gg + scale_color_manual(values=group.colors)
   return(gg)
 }
