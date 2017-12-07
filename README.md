@@ -13,7 +13,7 @@ devtools::install_github("brascoball/ggquik")
 
 ## Contents
 
-This package has three main functions: `quik_bars()`, `quik_lines()`, and `quik_bullets()`:
+This package has three main functions: `quik_bars()`, `quik_lines()`, `quik_bullets()`, `show_redhat_colors()`:
 
 ### quik_bars()
 This function uses ggplot2 to quickly create a bar plot using ggquik plot standards. The function only requires a dataset, `dimension`, `measure`, and `bar_groups`:
@@ -77,3 +77,8 @@ quik_theme(ggq, axis.text = 'x')
 ```
 
 ![](man/figures/README-quik_bullets1.png)
+
+### show_redhat_colors()
+The standard colors in ggquik are the [open source colors](brand.redhat.com/elements/color/) used at Red Hat. `show_redhat_colors()` allows you to see all the color options that can be used for the `quik_bars(bar_colors)`, `quik_lines(line_colors)`, and `quik_bullets(line_colors)` parameters. The colors are displayed in a plot like this:
+
+![](man/figures/README-colors1.png)
