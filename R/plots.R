@@ -148,6 +148,7 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
                         baseline = NULL) {
   # add additional formatted columns
   txt.d <- ggquik::plot_colors$text.dark
+  if(class(df[, line_groups]) != 'factor') df[, line_groups] <- as.factor(df[, line_groups])
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
                      currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
   # create initial plot
@@ -195,7 +196,7 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   }
   gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   # add text labels
-  gg <- gg + geom_text(family = 'Overpass', size = 3.25, position = t.pos,
+  if(label_size > 0) gg <- gg + geom_text(family = 'Overpass', size = label_size, position = t.pos,
                        label = df$measure_label, vjust = -0.5, color = txt.d)
   return(gg)
 }
