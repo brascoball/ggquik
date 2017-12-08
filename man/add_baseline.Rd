@@ -14,6 +14,7 @@ add_baseline(gg, direction, intercept)
 \item{intercept}{The location on which to add the line (usually a dimension factor or a measure)}
 }
 \description{
-Add a horizontal or vertical baseline to a plot
+Add a horizontal or vertical baseline to a plot. This adds the baseline
+under most layers.
 }
 

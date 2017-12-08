@@ -115,8 +115,9 @@ quik_prepare = function(df, dimension, measure, plot_type, facet_by = NULL, back
                            currency = NULL, measure_unit = NULL, measure_decimal = 0,
                            sum_label = NULL, text_cutoff = NULL) {
   position_text <- alt_label <- NULL
-  if (class(df[, dimension]) == 'yearmon') df <- factor_yearmon(df, dimension = dimension,
-                                                                     measure = measure, facet_by = facet_by)
+  if (substr(class(df[, dimension]), 1, 4) == 'year') df <- factor_zoo(df, dimension = dimension,
+                                                            measure = measure, facet_by = facet_by, 
+                                                            type = class(df[, dimension]))
   dt <- data.table(df)
   if (plot_type == 'bar')  dt[, position_text := cumsum(get(measure)) - (0.5 * get(measure)), by = c(dimension, facet_by)]
   if (!is.null(sum_label)) {
@@ -132,7 +133,7 @@ quik_prepare = function(df, dimension, measure, plot_type, facet_by = NULL, back
     dt[, background := sum(get(measure)), by = get(dimension)]
     setkeyv(dt, facet_by)
   }
-  df <- data.frame(dt)
+  df <- data.frame(dt, check.names = FALSE)
   df$measure_label <- format_label(df[, measure], currency = currency,
                                       measure_unit = measure_unit, measure_decimal = measure_decimal)
   if(!is.null(text_cutoff)) df[df[, measure] <= text_cutoff, "measure_label"] <- NA

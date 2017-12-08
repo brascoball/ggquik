@@ -116,8 +116,7 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
 
 #' Plot a quik line plot
 #'
-#' ggquik has specific standards for plots, and
-#' \code{quik_lines} helps your plot follow these.
+#' ggquik has specific standards for plots, and \code{quik_lines} helps your plot follow these.
 #'
 #' @import ggplot2
 #' @importFrom stats as.formula
@@ -162,21 +161,24 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
                         baseline = NULL) {
   # add additional formatted columns
   txt.d <- ggquik::plot_colors$text.dark
-  if(class(df[, line_groups]) != 'factor') df[, line_groups] <- as.factor(df[, line_groups])
-  df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
-                     currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
-  # create initial plot
-  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = line_groups))
+  # clean names if needed
+  names(df) <- make.names(names(df)); dimension <- make.names(dimension); measure <- make.names(measure)
   # update values based on one or many lines
   if (line_groups == 1) {
     fill.colors <- redhat_colors(line_colors)
     l_legend = FALSE
     line_groups <- shQuote(line_groups)
   } else {
+    line_groups <- make.names(line_groups)
     fill.colors <- set_group_colors(df[, line_groups], palette_type, line_colors)
     # fill.colors <- redhat_colors(line_colors, partial = TRUE)
     l_legend = 'legend'
+    if(class(df[, line_groups]) != 'factor') df[, line_groups] <- as.factor(df[, line_groups])
   }
+  df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
+                     currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
+  # create initial plot
+  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = line_groups))
   # add lines or area:
   if (area) {
     gg <- gg + geom_area(aes_string(fill = line_groups), alpha = 0.6)
@@ -212,6 +214,95 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   # add text labels
   if(label_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = label_size, position = t.pos,
                        label = df$measure_label, vjust = -0.5, color = txt.d)
+  return(gg)
+}
+
+
+#' Plot a quik points plot
+#'
+#' ggquik has specific standards for plots, and \code{quik_points} helps your plot follow these.
+#'
+#' @import ggplot2
+#' @importFrom stats as.formula
+#'
+#' @param df The data frame containing plot data
+#' @param dimension Usually the x-axis, values like "quarter" or "account type"
+#' @param measure The column containing numerical values to be plotted
+#' @param point_groups The column containing the different groups of lines
+#' @param palette_type A string. Allowed values are \code{"diverging"},
+#' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
+#' @param point_colors The the colors to be used for the line(s)/point(s)
+#' @param point_size A numeric. The size of the points (default is \code{0}, no points)
+#' @param dim_breaks A vector of specific dimension values that should be labeled.
+#' @param facet_col The column containing the group to facet the plots (if desired).
+#' @param area A logical. Should the plot be drawn as an area plot?
+#' @param label_size The size of the label text size. Default is 3
+#' @param currency A string, usually \code{$}
+#' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
+#' @param measure_decimal An integer. The number of decimal places to show.
+#' @param baseline A vector. First value is the intercept line \code{x} or \code{y},
+#' and the second value is the dimension or measure number that should be the baseline.
+#' For example, \code{c('x', 5)}.
+#'
+#' @usage quik_points(df, dimension, measure, point_groups, palette_type,
+#'                         point_colors, point_size, dim_breaks,
+#'                         facet_col, area, label_size,
+#'                         currency, measure_unit, measure_decimal,
+#'                         baseline)
+#'
+#' @examples 
+#' # Create a line plot from morley data
+#' data(morley)
+#' ggq <- quik_points(morley, dimension = 'Run', measure = 'Speed', 
+#'                  point_groups = 'Expt', label_size = 0)
+#' quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
+#'
+#' @export
+quik_points = function(df, dimension, measure, point_groups = 1, palette_type = 'qualitative',
+                       point_colors = NULL, point_size = 3, dim_breaks = NULL,
+                       facet_col = NULL, area = FALSE, label_size = 3,
+                       currency = NULL, measure_unit = NULL, measure_decimal = 0,
+                       baseline = NULL) {
+  # add additional formatted columns
+  txt.d <- ggquik::plot_colors$text.dark
+  # clean names if needed
+  x.lab = dimension; y.lab = measure; l.col = point_groups
+  names(df) <- make.names(names(df)); dimension <- make.names(dimension); measure <- make.names(measure)
+  # update values based on one or many lines
+  if (point_groups == 1) {
+    fill.colors <- redhat_colors(point_groups)
+    p_legend = FALSE
+    point_groups <- shQuote(point_groups)
+  } else {
+    point_groups <- make.names(point_groups)
+    fill.colors <- set_group_colors(df[, point_groups], palette_type, point_colors)
+    p_legend = 'legend'
+    if(class(df[, point_groups]) != 'factor') df[, point_groups] <- as.factor(df[, point_groups])
+  }
+  df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
+                     currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
+  # create initial plot
+  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = point_groups))
+  gg <- gg + geom_point(aes_string(color = point_groups), size = point_size)
+  # split to facets if needed
+  if (!is.null(facet_col)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_col)), scales = 'free', ncol = 1)
+  # add colors
+  gg <- gg + scale_color_manual(values=fill.colors, guide = p_legend)
+  if (!is.null(dim_breaks)) {
+    x.breaks = unique(df[,dimension])[dim_breaks]
+    gg <- gg + scale_x_discrete(breaks = x.breaks, drop = FALSE)
+    df[!(df[, dimension] %in% x.breaks), 'measure_label'] <- NA
+  }
+  y.breaks = y.labels = waiver()
+  y.expand <- expand_scale(mult = c(0.05, 0.05))
+  if (!is.null(measure_unit)) {
+    if (measure_unit == '%') y.labels = scales::percent
+  }
+  gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
+  # add text labels
+  if(label_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = label_size,
+                                          label = df$measure_label, vjust = -0.5, color = txt.d)
+  gg <- gg + labs(x = x.lab, y = y.lab, colour = l.col)
   return(gg)
 }
 

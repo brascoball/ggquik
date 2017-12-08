@@ -47,9 +47,9 @@ flip_levels = function(data_frame_column) {
 }
 
 
-#' Expand the yearmon into a factor
+#' Expand yearmon or yearqtr into a factor
 #'
-#' This will add in any missing dates with zeroes, then change the yearmon
+#' This will add in any missing dates with zeroes, then change the yearmon/yearqtr
 #' dimension into a factor so that it can be used in order like all other
 #' factor dimensions.
 #'
@@ -59,21 +59,24 @@ flip_levels = function(data_frame_column) {
 #' @param dimension The column containing the values to compare across (e.g. quarters, types)
 #' @param measure The data frame column with the numerical values to plot
 #' @param facet_by The data frame column with the facet data (if necessary).
+#' @param type The zoo type, either \code{"yearmon"} or \code{"yearqtr"}.
 #'
-#' @usage factor_yearmon(df, dimension, measure, facet_by)
+#' @usage factor_zoo(df, dimension, measure, facet_by, type)
 #'
 #' @export
-factor_yearmon = function(df, dimension, measure, facet_by) {
+factor_zoo = function(df, dimension, measure, facet_by, type) {
   dt <- data.table(df)
-  all_yearmon = seq(min(dt[, get(dimension)]), max(dt[, get(dimension)]), 1/12)
+  zoo_period <- ifelse(type == 'yearmon', 1/12, 1/4)
+  zoo_format <- ifelse(type == 'yearmon', "%b %y", "FY%yQ%q")
+  all_zoo = seq(min(dt[, get(dimension)]), max(dt[, get(dimension)]), zoo_period)
   if(!is.null(facet_by)) {
-    grid <- CJ(all_yearmon, dt[, get(facet_by)], unique = TRUE)
+    grid <- CJ(all_zoo, dt[, get(facet_by)], unique = TRUE)
     names(grid) <- c(dimension, facet_by)
     dt <- merge(grid, dt, all.x = TRUE)
     dt[is.na(get(measure)), (measure) := 0]
   }
   df <- data.frame(dt)
-  df[, dimension] <- factor(format(df[, dimension], "%b %y"), levels = format(all_yearmon, "%b %y"))
+  df[, dimension] <- factor(format(df[, dimension], zoo_format), levels = format(all_zoo, zoo_format))
   return(df)
 }
 

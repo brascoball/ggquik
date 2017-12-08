@@ -1,6 +1,7 @@
 #' Add a baseline to a plot.
 #'
-#' Add a horizontal or vertical baseline to a plot
+#' Add a horizontal or vertical baseline to a plot. This adds the baseline
+#' under most layers.
 #'
 #' @param gg The ggplot object on which to add a baseline
 #' @param direction The direction on which to add the baseline: \code{x}, or \code{y}
@@ -10,10 +11,46 @@
 #'
 #' @export
 add_baseline = function(gg, direction, intercept) {
-  if (direction == 'x') return(gg + geom_vline(xintercept = intercept,
-                                               linetype = "longdash", alpha = 0.5, size = 0.2))
-  if (direction == 'y') return(gg + geom_hline(yintercept = intercept,
-                                               linetype = "longdash", alpha = 0.5, size = 0.2))
+  if (direction == 'x') gg <- gg + geom_vline(xintercept = intercept,
+                                               linetype = "longdash", alpha = 0.5, size = 0.2)
+  if (direction == 'y') gg <- gg + geom_hline(yintercept = intercept,
+                                               linetype = "longdash", alpha = 0.5, size = 0.2)
+  le <- length(gg$layers)
+  # move the baseline under the points and text
+  gg$layers <- c(gg$layers[1], gg$layers[le], gg$layers[2:(le-1)])
+  return(gg)
+}
+
+
+#' Add a baseband to a plot.
+#'
+#' Add a horizontal or vertical background band (\code{geom_rect}) to a plot. 
+#' This adds the band under most existing layers.
+#'
+#' @param gg The ggplot object on which to add a baseline
+#' @param direction The direction on which to add the baseline: \code{x}, or \code{y}
+#' @param min The location to start the band
+#' @param max The location to end the band
+#' @param bg_color The background color for the band area. Default is \code{"Green 4"}
+#'
+#' @usage add_baseband(gg, direction, min, max, bg_color)
+#'
+#' @export
+add_baseband = function(gg, direction, min, max, bg_color = "Green 4") {
+  if(direction == 'x') {
+    gg <- gg + geom_rect(xmin=min, xmax=max, ymin=-Inf, ymax=Inf, alpha=0.02, fill=redhat_colors(bg_color), color = NA) +
+      geom_vline(xintercept = min, alpha = 0.5, linetype = "longdash", size = 0.2) +
+      geom_vline(xintercept = max, alpha = 0.5, linetype = "longdash", size = 0.2)
+  } else {
+    gg <- gg + geom_rect(xmin=-Inf, xmax=Inf, ymin=min, ymax=max, alpha=0.02, fill=redhat_colors(bg_color), color = NA) +
+      geom_hline(yintercept = min, alpha = 0.5, linetype = "longdash", size = 0.2) +
+      geom_hline(yintercept = max, alpha = 0.5, linetype = "longdash", size = 0.2)
+  }
+  le <- length(gg$layers)
+  # move the base band under most layers
+  # if (class(gg$layers[[1]]$geom)[[1]] == 'GeomLine') gg$layers <- c(gg$layers[1], gg$layers[(le-2):le], gg$layers[2:(le-3)])
+  gg$layers <- c(gg$layers[(le-2):le], gg$layers[1:(le-3)])
+  return(gg)
 }
 
 
