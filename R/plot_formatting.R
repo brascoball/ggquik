@@ -20,7 +20,7 @@
 #' @export
 set_group_colors = function(group_column, palette_type, color_names = NULL) {
   plot_colors <- ggquik::plot_colors
-  if(class(group_column) != 'factor') group_column <- as.factor(group_column)
+  if(!(class(group_column) %in% c('factor', 'data.frame'))) group_column <- as.factor(group_column)
   if (is.null(color_names)) {
     if (palette_type == 'sequential') color_names = 'Teal'
     if (palette_type == 'manual') stop("Please provide values for color_names")
@@ -141,5 +141,43 @@ quik_prepare = function(df, dimension, measure, plot_type, facet_by = NULL, back
   df$currency <- currency
   df$measure_unit <- measure_unit
   return(df)
+}
+
+
+#' Set various quik options for plotting
+#' 
+#' @param df The data frame containing plot data
+#' @param dimension The column containing the values to compare across (e.g. quarters, types)
+#' @param measure The data frame column with the numerical values to plot
+#' @param groups The data frame column containing the different groups
+#' @param palette_type A string. Allowed values are \code{"diverging"},
+#' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
+#' @param colors The the colors to be used for the line(s)/point(s)
+#' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
+#' @param measure_decimal An integer. The number of decimal places to show.
+#' 
+#' 
+#' @export
+set_quik_opts = function(df, dimension, measure, groups, palette_type, colors, measure_decimal, measure_unit) {
+  quik_opts = list()
+  # add additional formatted columns
+  quik_opts$txt.d <- ggquik::plot_colors$text.dark
+  # set the decimal
+  if(is.null(measure_decimal)) measure_decimal <- set_decimal(df[, measure], measure_unit)
+  quik_opts$measure_decimal <- measure_decimal
+  # clean names if needed
+  quik_opts$x.lab = dimension; quik_opts$y.lab = measure; quik_opts$c.lab = groups
+  # update values based on one or many lines
+  if (is.null(groups)) {
+    if (is.null(colors)) colors = 'Purple'
+    quik_opts$colors <- redhat_colors(colors)
+    quik_opts$legend = FALSE
+    quik_opts$groups <- shQuote("1")
+  } else {
+    quik_opts$colors <- set_group_colors(df[, groups], palette_type, colors)
+    quik_opts$legend = 'legend'
+    quik_opts$groups <- make.names(groups)
+  }
+  return(quik_opts)
 }
 

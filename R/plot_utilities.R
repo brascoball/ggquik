@@ -98,23 +98,3 @@ set_decimal = function(measure, measure_unit) {
   return(measure_decimal)
 }
 
-
-#' Quik save a quik plot as a png file
-#'
-#' @import ggplot2
-#'
-#' @param gg The ggplot to be themed
-#' @param dir The directory to which the plot will be saved
-#' @param filename The new filename for the plot
-#' @param width The width of the png (best between 4 and 6)
-#' @param height The height of the png (best between 2 and 5)
-#'
-#' @usage quiksave(gg, dir, filename, width, height)
-#'
-#' @export
-quiksave = function(gg, dir, filename, width=6, height=4.5) {
-  gg <- ggplot_gtable(ggplot_build(gg))
-  gg$layout$clip[gg$layout$name == "panel"] <- "off"
-  cowplot::ggsave(paste0(dir, filename, ".png"), gg, bg='transparent', width=width, height=height)
-}
-

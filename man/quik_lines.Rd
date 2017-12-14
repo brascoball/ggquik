@@ -4,11 +4,10 @@
 \alias{quik_lines}
 \title{Plot a quik line plot}
 \usage{
-quik_lines(df, dimension, measure, line_groups, palette_type,
-                        line_colors, point_size, dim_breaks,
-                        facet_col, area, label_size,
-                        currency, measure_unit, measure_decimal,
-                        baseline)
+quik_lines(df, dimension, measure, groups, palette_type,
+                        colors, point_size, dim_breaks,
+                        facet_by, area, text_size,
+                        currency, measure_unit, measure_decimal)
 }
 \arguments{
 \item{df}{The data frame containing plot data}
@@ -17,32 +16,28 @@ quik_lines(df, dimension, measure, line_groups, palette_type,
 
 \item{measure}{The column containing numerical values to be plotted}
 
-\item{line_groups}{The column containing the different groups of lines}
+\item{groups}{The column containing the different groups of lines}
 
 \item{palette_type}{A string. Allowed values are \code{"diverging"},
 \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.}
 
-\item{line_colors}{The the colors to be used for the line(s)/point(s)}
+\item{colors}{The the colors to be used for the line(s)/point(s)}
 
 \item{point_size}{A numeric. The size of the points (default is \code{0}, no points)}
 
 \item{dim_breaks}{A vector of specific dimension values that should be labeled.}
 
-\item{facet_col}{The column containing the group to facet the plots (if desired).}
+\item{facet_by}{The column containing the group to facet the plots (if desired).}
 
 \item{area}{A logical. Should the plot be drawn as an area plot?}
 
-\item{label_size}{The size of the label text size. Default is 3}
+\item{text_size}{The size of the label text size. Default is 3}
 
 \item{currency}{A string, usually \code{$}}
 
 \item{measure_unit}{A string. Can be \code{\%}, \code{K}, or \code{M}}
 
 \item{measure_decimal}{An integer. The number of decimal places to show.}
-
-\item{baseline}{A vector. First value is the intercept line \code{x} or \code{y},
-and the second value is the dimension or measure number that should be the baseline.
-For example, \code{c('x', 5)}.}
 }
 \description{
 ggquik has specific standards for plots, and \code{quik_lines} helps your plot follow these.
@@ -50,8 +45,7 @@ ggquik has specific standards for plots, and \code{quik_lines} helps your plot f
 \examples{
 # Create a line plot from morley data
 data(morley)
-ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', 
-                 line_groups = 'Expt', label_size = 0)
+ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', groups = 'Expt')
 quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 
 }

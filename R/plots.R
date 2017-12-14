@@ -70,8 +70,10 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
     h.just <- 0
     alt.pos <- 1.01
   } else {
-    if(class(df[, bar_groups]) != 'factor') df[, bar_groups] <- as.factor(df[, bar_groups])
-    df[, bar_groups] <- flip_levels(df[, bar_groups])
+    if (!is.null(bar_groups)) {
+      if(class(df[, bar_groups]) != 'factor') df[, bar_groups] <- as.factor(df[, bar_groups])
+      df[, bar_groups] <- flip_levels(df[, bar_groups])
+    } else { bar_groups <- shQuote("1") }
     h.just <- 0.5
     alt.pos <- 1.03
   }
@@ -124,81 +126,64 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
 #' @param df The data frame containing plot data
 #' @param dimension Usually the x-axis, values like "quarter" or "account type"
 #' @param measure The column containing numerical values to be plotted
-#' @param line_groups The column containing the different groups of lines
+#' @param groups The column containing the different groups of lines
 #' @param palette_type A string. Allowed values are \code{"diverging"},
 #' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
-#' @param line_colors The the colors to be used for the line(s)/point(s)
+#' @param colors The the colors to be used for the line(s)/point(s)
 #' @param point_size A numeric. The size of the points (default is \code{0}, no points)
 #' @param dim_breaks A vector of specific dimension values that should be labeled.
-#' @param facet_col The column containing the group to facet the plots (if desired).
+#' @param facet_by The column containing the group to facet the plots (if desired).
 #' @param area A logical. Should the plot be drawn as an area plot?
-#' @param label_size The size of the label text size. Default is 3
+#' @param text_size The size of the label text size. Default is 3
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
 #' @param measure_decimal An integer. The number of decimal places to show.
-#' @param baseline A vector. First value is the intercept line \code{x} or \code{y},
-#' and the second value is the dimension or measure number that should be the baseline.
-#' For example, \code{c('x', 5)}.
 #'
-#' @usage quik_lines(df, dimension, measure, line_groups, palette_type,
-#'                         line_colors, point_size, dim_breaks,
-#'                         facet_col, area, label_size,
-#'                         currency, measure_unit, measure_decimal,
-#'                         baseline)
+#' @usage quik_lines(df, dimension, measure, groups, palette_type,
+#'                         colors, point_size, dim_breaks,
+#'                         facet_by, area, text_size,
+#'                         currency, measure_unit, measure_decimal)
 #'
 #' @examples 
 #' # Create a line plot from morley data
 #' data(morley)
-#' ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', 
-#'                  line_groups = 'Expt', label_size = 0)
+#' ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', groups = 'Expt')
 #' quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 #'
 #' @export
-quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'qualitative',
-                        line_colors = NULL, point_size = 0, dim_breaks = NULL,
-                        facet_col = NULL, area = FALSE, label_size = 3,
-                        currency = NULL, measure_unit = NULL, measure_decimal = 0,
-                        baseline = NULL) {
-  # add additional formatted columns
-  txt.d <- ggquik::plot_colors$text.dark
-  # clean names if needed
+quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qualitative',
+                        colors = NULL, point_size = 0, dim_breaks = NULL,
+                        facet_by = NULL, area = FALSE, text_size = 3,
+                        currency = NULL, measure_unit = NULL, measure_decimal = 0) {
+  quik_opts <- set_quik_opts(df, dimension = dimension, measure = measure, groups = groups, 
+                             colors = colors, palette_type = palette_type, 
+                             measure_decimal = measure_decimal, measure_unit = measure_unit)
   names(df) <- make.names(names(df)); dimension <- make.names(dimension); measure <- make.names(measure)
-  # update values based on one or many lines
-  if (line_groups == 1) {
-    fill.colors <- redhat_colors(line_colors)
-    l_legend = FALSE
-    line_groups <- shQuote(line_groups)
-  } else {
-    line_groups <- make.names(line_groups)
-    fill.colors <- set_group_colors(df[, line_groups], palette_type, line_colors)
-    # fill.colors <- redhat_colors(line_colors, partial = TRUE)
-    l_legend = 'legend'
-    if(class(df[, line_groups]) != 'factor') df[, line_groups] <- as.factor(df[, line_groups])
+  if (!is.null(groups)) { 
+    if(class(df[, groups]) != 'factor') df[, groups] <- as.factor(df[, groups])
   }
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
-                     currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
+                     currency = currency, measure_unit = measure_unit, measure_decimal = quik_opts$measure_decimal)
   # create initial plot
-  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = line_groups))
+  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = quik_opts$groups))
   # add lines or area:
   if (area) {
-    gg <- gg + geom_area(aes_string(fill = line_groups), alpha = 0.6)
+    gg <- gg + geom_area(aes_string(fill = quik_opts$groups), alpha = 0.6)
     p.pos <- position_stack()
     t.pos <- "identity"
   } else {
-    gg <- gg + geom_line(aes_string(color = line_groups))
+    gg <- gg + geom_line(aes_string(color = quik_opts$groups))
     p.pos <- "identity"
     t.pos <- "identity"
   }
-  # add baseline (must be after adding lines or else odd error)
-  if (!is.null(baseline)) gg <- add_baseline(gg, baseline[1], as.numeric(baseline[2]))
   # add points
-  if (point_size > 0) gg <- gg + geom_point(aes_string(color = line_groups), size = point_size,
+  if (point_size > 0) gg <- gg + geom_point(aes_string(color = quik_opts$groups), size = point_size,
                                             position = p.pos)
   # split to facets if needed
-  if (!is.null(facet_col)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_col)), scales = 'free', ncol = 1)
+  if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_by)), scales = 'free', ncol = 1)
   # add colors
-  gg <- gg + scale_color_manual(values=fill.colors, guide = l_legend)
-  if (area) gg <- gg + scale_fill_manual(values=fill.colors, guide = FALSE)
+  gg <- gg + scale_color_manual(values=quik_opts$colors, guide = quik_opts$legend)
+  if (area) gg <- gg + scale_fill_manual(values=quik_opts$colors, guide = FALSE)
   # add dimension breaks if necessary
   if (!is.null(dim_breaks)) {
     x.breaks = unique(df[,dimension])[dim_breaks]
@@ -212,8 +197,9 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
   }
   gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   # add text labels
-  if(label_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = label_size, position = t.pos,
-                       label = df$measure_label, vjust = -0.5, color = txt.d)
+  if(text_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = text_size, position = t.pos,
+                       label = df$measure_label, vjust = -0.5, color = quik_opts$txt.d)
+  gg <- gg + labs(x = quik_opts$x.lab, y = quik_opts$y.lab, colour = quik_opts$c.lab)
   return(gg)
 }
 
@@ -228,66 +214,52 @@ quik_lines = function(df, dimension, measure, line_groups = 1, palette_type = 'q
 #' @param df The data frame containing plot data
 #' @param dimension Usually the x-axis, values like "quarter" or "account type"
 #' @param measure The column containing numerical values to be plotted
-#' @param point_groups The column containing the different groups of lines
+#' @param groups The column containing the different groups of lines
 #' @param palette_type A string. Allowed values are \code{"diverging"},
 #' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
-#' @param point_colors The the colors to be used for the line(s)/point(s)
+#' @param colors The the colors to be used for the line(s)/point(s)
 #' @param point_size A numeric. The size of the points (default is \code{0}, no points)
 #' @param dim_breaks A vector of specific dimension values that should be labeled.
-#' @param facet_col The column containing the group to facet the plots (if desired).
+#' @param facet_by The column containing the group to facet the plots (if desired).
 #' @param area A logical. Should the plot be drawn as an area plot?
-#' @param label_size The size of the label text size. Default is 3
+#' @param text_size The size of the label text size. Default is 3
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
 #' @param measure_decimal An integer. The number of decimal places to show.
-#' @param baseline A vector. First value is the intercept line \code{x} or \code{y},
-#' and the second value is the dimension or measure number that should be the baseline.
-#' For example, \code{c('x', 5)}.
 #'
-#' @usage quik_points(df, dimension, measure, point_groups, palette_type,
-#'                         point_colors, point_size, dim_breaks,
-#'                         facet_col, area, label_size,
-#'                         currency, measure_unit, measure_decimal,
-#'                         baseline)
+#' @usage quik_points(df, dimension, measure, groups, palette_type,
+#'                         colors, point_size, dim_breaks,
+#'                         facet_by, area, text_size,
+#'                         currency, measure_unit, measure_decimal)
 #'
 #' @examples 
 #' # Create a line plot from morley data
 #' data(morley)
 #' ggq <- quik_points(morley, dimension = 'Run', measure = 'Speed', 
-#'                  point_groups = 'Expt', label_size = 0)
+#'                  groups = 'Expt', text_size = 0)
 #' quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 #'
 #' @export
-quik_points = function(df, dimension, measure, point_groups = 1, palette_type = 'qualitative',
-                       point_colors = NULL, point_size = 3, dim_breaks = NULL,
-                       facet_col = NULL, area = FALSE, label_size = 3,
-                       currency = NULL, measure_unit = NULL, measure_decimal = 0,
-                       baseline = NULL) {
-  # add additional formatted columns
-  txt.d <- ggquik::plot_colors$text.dark
-  # clean names if needed
-  x.lab = dimension; y.lab = measure; l.col = point_groups
+quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qualitative',
+                       colors = NULL, point_size = 2, dim_breaks = NULL,
+                       facet_by = NULL, area = FALSE, text_size = 3,
+                       currency = NULL, measure_unit = NULL, measure_decimal = NULL) {
+  quik_opts <- set_quik_opts(df, dimension = dimension, measure = measure, groups = groups, 
+                             colors = colors, palette_type = palette_type, 
+                             measure_decimal = measure_decimal, measure_unit = measure_unit)
   names(df) <- make.names(names(df)); dimension <- make.names(dimension); measure <- make.names(measure)
-  # update values based on one or many lines
-  if (point_groups == 1) {
-    fill.colors <- redhat_colors(point_groups)
-    p_legend = FALSE
-    point_groups <- shQuote(point_groups)
-  } else {
-    point_groups <- make.names(point_groups)
-    fill.colors <- set_group_colors(df[, point_groups], palette_type, point_colors)
-    p_legend = 'legend'
-    if(class(df[, point_groups]) != 'factor') df[, point_groups] <- as.factor(df[, point_groups])
+  if (!is.null(groups)) { 
+    if(class(df[, groups]) != 'factor') df[, groups] <- as.factor(df[, groups])
   }
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
-                     currency = currency, measure_unit = measure_unit, measure_decimal = measure_decimal)
+                     currency = currency, measure_unit = measure_unit, measure_decimal = quik_opts$measure_decimal)
   # create initial plot
-  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = point_groups))
-  gg <- gg + geom_point(aes_string(color = point_groups), size = point_size)
+  gg <- ggplot(df, aes_string(x = dimension, y = measure, group = quik_opts$groups))
+  gg <- gg + geom_point(aes_string(color = quik_opts$groups), size = point_size)
   # split to facets if needed
-  if (!is.null(facet_col)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_col)), scales = 'free', ncol = 1)
+  if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_by)), scales = 'free', ncol = 1)
   # add colors
-  gg <- gg + scale_color_manual(values=fill.colors, guide = p_legend)
+  gg <- gg + scale_color_manual(values=quik_opts$colors, guide = quik_opts$legend)
   if (!is.null(dim_breaks)) {
     x.breaks = unique(df[,dimension])[dim_breaks]
     gg <- gg + scale_x_discrete(breaks = x.breaks, drop = FALSE)
@@ -300,9 +272,9 @@ quik_points = function(df, dimension, measure, point_groups = 1, palette_type = 
   }
   gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
   # add text labels
-  if(label_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = label_size,
-                                          label = df$measure_label, vjust = -0.5, color = txt.d)
-  gg <- gg + labs(x = x.lab, y = y.lab, colour = l.col)
+  if(text_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = text_size,
+                                         label = df$measure_label, vjust = -1, color = quik_opts$txt.d)
+  gg <- gg + labs(x = quik_opts$x.lab, y = quik_opts$y.lab, colour = quik_opts$c.lab)
   return(gg)
 }
 
@@ -324,7 +296,7 @@ quik_points = function(df, dimension, measure, point_groups = 1, palette_type = 
 #' @param bar_fill The column with the distance to fill the bar (if needed)
 #' @param dotted_line The column with the dotted line distance (if needed)
 #' @param solid_line The column with the solid line distance (if needed)
-#' @param label_size The size of the label text size. Default is 3
+#' @param text_size The size of the label text size. Default is 3
 #' @param palette_type A string. Allowed values are \code{"diverging"},
 #' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
 #' @param line_colors A string. What color should be used for the lines (e.g.
@@ -335,7 +307,7 @@ quik_points = function(df, dimension, measure, point_groups = 1, palette_type = 
 #' @param ... Parameters to pass on to facet_wrap, such as \code{nrow} or \code{ncol}
 #'
 #' @usage quik_bullets(df, group_col, range_low, range_high, bar_fill,
-#'                         dotted_line, solid_line, label_size,
+#'                         dotted_line, solid_line, text_size,
 #'                         palette_type, line_colors,
 #'                         currency, measure_unit, ...)
 #'                         
@@ -351,7 +323,7 @@ quik_points = function(df, dimension, measure, point_groups = 1, palette_type = 
 #'
 #' @export
 quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
-                          dotted_line = NULL, solid_line = NULL, label_size = 3,
+                          dotted_line = NULL, solid_line = NULL, text_size = 3,
                           palette_type = 'qualitative', line_colors = "Purple",
                           currency = NULL, measure_unit = NULL, ...) {
   measures <- names(df)[names(df) %in% c(range_low, range_high, bar_fill, solid_line, dotted_line)]
@@ -369,12 +341,12 @@ quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
   if (!is.null(solid_line)) {
     gg <- gg + geom_errorbar(aes_string(ymin = solid_line, ymax = solid_line), width = 0.5, size = 1) +
       geom_text(aes_string(y = solid_line, label = paste0(solid_line, '_label')),
-                vjust = -4, color = txt.d, family = set_quik_family(), size = 4)
+                vjust = -4, color = txt.d, family = set_quik_family(), size = text_size)
   }
   if (!is.null(dotted_line)) {
     gg <- gg + geom_errorbar(aes_string(ymin = dotted_line, ymax = dotted_line), width = 0.5, size = 1, linetype = 'dashed') +
       geom_text(aes_string(y = dotted_line, label = paste0(dotted_line, '_label')),
-              vjust = -4, color = txt.d, family = set_quik_family(), size = 4)
+              vjust = -4, color = txt.d, family = set_quik_family(), text_size = 4)
   }
   gg <- gg + coord_flip() + facet_wrap(~group, scales = 'free', ...)
   y.labels = waiver()

@@ -5,7 +5,7 @@
 \title{Plot a quik bullet plot}
 \usage{
 quik_bullets(df, group_col, range_low, range_high, bar_fill,
-                        dotted_line, solid_line, label_size,
+                        dotted_line, solid_line, text_size,
                         palette_type, line_colors,
                         currency, measure_unit, ...)
 }
@@ -24,7 +24,7 @@ quik_bullets(df, group_col, range_low, range_high, bar_fill,
 
 \item{solid_line}{The column with the solid line distance (if needed)}
 
-\item{label_size}{The size of the label text size. Default is 3}
+\item{text_size}{The size of the label text size. Default is 3}
 
 \item{palette_type}{A string. Allowed values are \code{"diverging"},
 \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.}
