@@ -4,9 +4,9 @@
 \alias{quik_bars}
 \title{Plot a quik bar plot}
 \usage{
-quik_bars(df, dimension, measure, bar_groups,
+quik_bars(df, dimension, measure, groups, position,
                   text_size, alt_text_size, alt_label, facet_by, background,
-                  flip_plot, dim_breaks, palette_type, bar_colors,
+                  flip_plot, dim_breaks, palette_type, colors,
                   currency, measure_unit, measure_decimal,
                   v.just, text_cutoff, ...)
 }
@@ -16,8 +16,6 @@ quik_bars(df, dimension, measure, bar_groups,
 \item{dimension}{Usually the x-axis, values like "quarter" or "account type"}
 
 \item{measure}{The column containing numerical values to be plotted}
-
-\item{bar_groups}{If a stacked or dodged bar, the column containing the groups}
 
 \item{text_size}{A numeric. The size of the text within the bars (default is 3)}
 
@@ -36,7 +34,7 @@ quik_bars(df, dimension, measure, bar_groups,
 \item{palette_type}{A string. Allowed values are \code{"diverging"},
 \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.}
 
-\item{bar_colors}{A string. What color should be used for the bars (e.g.
+\item{colors}{A string. What color should be used for the bars (e.g.
 "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
 "green", "purple", "teal")}
 
@@ -51,6 +49,10 @@ quik_bars(df, dimension, measure, bar_groups,
 \item{text_cutoff}{A number. If text values below a certain number should not be included.}
 
 \item{...}{Additional parameters to pass on it facet_wrap}
+
+\item{groups}{If a stacked or dodged bar, the column containing the groups}
+
+\item{bar_type}{If groups, whether to \code{"stack"} (default) or \code{"dodge"} the groups.}
 }
 \description{
 ggquik has specific standards for plots, and

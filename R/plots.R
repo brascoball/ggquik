@@ -9,7 +9,8 @@
 #' @param df The data frame containing plot data
 #' @param dimension Usually the x-axis, values like "quarter" or "account type"
 #' @param measure The column containing numerical values to be plotted
-#' @param bar_groups If a stacked or dodged bar, the column containing the groups
+#' @param groups If a stacked or dodged bar, the column containing the groups
+#' @param bar_type If groups, whether to \code{"stack"} (default) or \code{"dodge"} the groups.
 #' @param text_size A numeric. The size of the text within the bars (default is 3)
 #' @param alt_text_size A numeric. The size of the alternative text (default is 3)
 #' @param alt_label The column containing an alternate label (if any)
@@ -19,7 +20,7 @@
 #' @param dim_breaks A vector of specific dimensions values that should be labeled.
 #' @param palette_type A string. Allowed values are \code{"diverging"},
 #' \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.
-#' @param bar_colors A string. What color should be used for the bars (e.g.
+#' @param colors A string. What color should be used for the bars (e.g.
 #' "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
 #' "green", "purple", "teal")
 #' @param currency A string, usually \code{$}
@@ -29,22 +30,22 @@
 #' @param text_cutoff A number. If text values below a certain number should not be included.
 #' @param ... Additional parameters to pass on it facet_wrap
 #'
-#' @usage quik_bars(df, dimension, measure, bar_groups,
+#' @usage quik_bars(df, dimension, measure, groups, position,
 #'                   text_size, alt_text_size, alt_label, facet_by, background,
-#'                   flip_plot, dim_breaks, palette_type, bar_colors,
+#'                   flip_plot, dim_breaks, palette_type, colors,
 #'                   currency, measure_unit, measure_decimal,
 #'                   v.just, text_cutoff, ...)
 #'                   
 #' @examples 
 #' # Create a bar plot from morley data
 #' data(morley)
-#' ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', bar_groups = 'Expt')
+#' ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', groups = 'Expt')
 #' quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 #'
 #' @export
-quik_bars = function(df, dimension, measure, bar_groups = NULL,
+quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
                        text_size = 3, alt_text_size = 4, alt_label = NULL, facet_by = NULL, background = FALSE,
-                       flip_plot = FALSE, dim_breaks = NULL, palette_type = 'qualitative', bar_colors = NULL,
+                       flip_plot = FALSE, dim_breaks = NULL, palette_type = 'qualitative', colors = NULL,
                        currency = NULL, measure_unit = NULL, measure_decimal = NULL,
                        v.just = 0.5, text_cutoff = 0, ...) {
   bar_width <- 0.65
@@ -55,10 +56,10 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
                         plot_type = 'bar', currency = currency,
                         measure_unit = measure_unit, measure_decimal = measure_decimal,
                         sum_label = alt_label, text_cutoff = text_cutoff)
-  fill.colors <- set_group_colors(df[, bar_groups], palette_type, bar_colors)
+  fill.colors <- set_group_colors(df[, groups], palette_type, colors)
   if (palette_type == 'diverging') {
-    keep_labels <- levels(df[, bar_groups])[c(1, length(levels(df[, bar_groups])))]
-    df[!(df[, bar_groups] %in% keep_labels), 'measure_label'] <- NA
+    keep_labels <- levels(df[, groups])[c(1, length(levels(df[, groups])))]
+    df[!(df[, groups] %in% keep_labels), 'measure_label'] <- NA
   }
   txt.l <- ggquik::plot_colors$text.light
   txt.d <- ggquik::plot_colors$text.dark
@@ -70,20 +71,20 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
     h.just <- 0
     alt.pos <- 1.01
   } else {
-    if (!is.null(bar_groups)) {
-      if(class(df[, bar_groups]) != 'factor') df[, bar_groups] <- as.factor(df[, bar_groups])
-      df[, bar_groups] <- flip_levels(df[, bar_groups])
-    } else { bar_groups <- shQuote("1") }
+    if (!is.null(groups)) {
+      if(class(df[, groups]) != 'factor') df[, groups] <- as.factor(df[, groups])
+      if (position == 'stack') df[, groups] <- flip_levels(df[, groups])
+    } else { groups <- shQuote("1") }
     h.just <- 0.5
     alt.pos <- 1.03
   }
   gg <- ggplot(df, aes_string(x = dimension, y = measure))
   if (background) {
     bar_width <- 0.95
-    gg <- gg + geom_bar(aes(y = background), stat = 'identity', fill = bg.f,
+    gg <- gg + geom_bar(aes(y = background), stat = 'identity', fill = bg.f, position = position,
                         width = bar_width, alpha = 0.7)
   }
-  gg <- gg + geom_bar(aes_string(group = bar_groups, fill = bar_groups), stat = "identity", width = bar_width)
+  gg <- gg + geom_bar(aes_string(group = groups, fill = groups), stat = 'identity', position = position, width = bar_width)
   if (!is.null(dim_breaks)) gg <- gg + scale_x_discrete(breaks = unique(df[,dimension])[dim_breaks])
   if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0("~", facet_by)), ...)
   if (flip_plot) {
@@ -91,10 +92,23 @@ quik_bars = function(df, dimension, measure, bar_groups = NULL,
     fill.colors <- rev(fill.colors)
   }
   if (text_size > 0) {
-    gg <- gg + geom_text(aes_string(y = 'position_text', label = 'measure_label'), family=set_quik_family(),
-                color=txt.l, size = text_size, vjust = v.just)
+    if (position == 'stack') {
+      position = 'identity'
+      position_text = 'position_text'
+      text_groups = NULL
+      guide_reverse = TRUE
+    } else {
+      position <- position_dodge(width = bar_width)
+      position_text = measure
+      text_groups = groups
+      v.just = v.just + 1
+      guide_reverse = FALSE
+    }
+    gg <- gg + geom_text(aes_string(y = position_text, label = 'measure_label', group = text_groups), 
+                         position = position, family=set_quik_family(),
+                         color=txt.l, size = text_size, vjust = v.just)
   }
-  gg <- gg + scale_fill_manual(values=fill.colors) + guides(fill=guide_legend(reverse = TRUE))
+  gg <- gg + scale_fill_manual(values=fill.colors) + guides(fill=guide_legend(reverse = guide_reverse))
   if (!is.null(alt_label)) {
     # y.expand <- waiver()
     y.expand <- expand_scale(mult = c(0, .1))
@@ -199,7 +213,6 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
   # add text labels
   if(text_size > 0) gg <- gg + geom_text(family = set_quik_family(), size = text_size, position = t.pos,
                        label = df$measure_label, vjust = -0.5, color = quik_opts$txt.d)
-  gg <- gg + labs(x = quik_opts$x.lab, y = quik_opts$y.lab, colour = quik_opts$c.lab)
   return(gg)
 }
 
