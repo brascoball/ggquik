@@ -17,7 +17,7 @@ quik_theme(gg, clean_grid, clean_axis, clean_facet,
 \item{clean_facet}{A logical. Should the facet titles be cleaned?}
 
 \item{legend}{A string. One of three options: \code{"bottom"},
-\code{"right"}, or \code{"none"}. Default is \code{"none"}.}
+\code{"right"}, or \code{"none"}. Default is \code{"bottom"}.}
 
 \item{transparent}{A logical. Should the plot be transparent for saving?}
 

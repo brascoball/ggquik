@@ -7,7 +7,7 @@
 quik_points(df, dimension, measure, groups, palette_type,
                         colors, point_size, dim_breaks,
                         facet_by, area, text_size,
-                        currency, measure_unit, measure_decimal)
+                        currency, measure_unit, measure_decimal, ...)
 }
 \arguments{
 \item{df}{The data frame containing plot data}
@@ -38,6 +38,8 @@ quik_points(df, dimension, measure, groups, palette_type,
 \item{measure_unit}{A string. Can be \code{\%}, \code{K}, or \code{M}}
 
 \item{measure_decimal}{An integer. The number of decimal places to show.}
+
+\item{...}{Additional parameters to pass on it facet_wrap (e.g. scales = free, ncol = 1)}
 }
 \description{
 ggquik has specific standards for plots, and \code{quik_points} helps your plot follow these.

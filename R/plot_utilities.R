@@ -25,8 +25,8 @@ set_quik_family = function() {
 #'
 #' @export
 use_limits = function() {
-  function(x) c(min(x)+diff(range(x))*0.05/1.1,
-                max(x)-diff(range(x))*0.05/1.1)
+  function(x) c(min(x)+diff(range(x))*0.05/0.6,
+                max(x)-diff(range(x))*0.05/0.6)
 }
 
 

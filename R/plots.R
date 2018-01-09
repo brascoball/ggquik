@@ -28,7 +28,7 @@
 #' @param measure_decimal An integer. The number of decimal places to show. Default is 0.
 #' @param v.just A numeric. The vertical adjustment for the text.
 #' @param text_cutoff A number. If text values below a certain number should not be included.
-#' @param ... Additional parameters to pass on it facet_wrap
+#' @param ... Additional parameters to pass on it facet_wrap (e.g. scales = free, ncol = 1)
 #'
 #' @usage quik_bars(df, dimension, measure, groups, position,
 #'                   text_size, alt_text_size, alt_label, facet_by, background,
@@ -152,11 +152,12 @@ quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
 #' @param measure_decimal An integer. The number of decimal places to show.
+#' @param ... Additional parameters to pass on it facet_wrap (e.g. scales = free, ncol = 1)
 #'
 #' @usage quik_lines(df, dimension, measure, groups, palette_type,
 #'                         colors, point_size, dim_breaks,
 #'                         facet_by, area, text_size,
-#'                         currency, measure_unit, measure_decimal)
+#'                         currency, measure_unit, measure_decimal, ...)
 #'
 #' @examples 
 #' # Create a line plot from morley data
@@ -168,7 +169,7 @@ quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
 quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qualitative',
                         colors = NULL, point_size = 0, dim_breaks = NULL,
                         facet_by = NULL, area = FALSE, text_size = 3,
-                        currency = NULL, measure_unit = NULL, measure_decimal = 0) {
+                        currency = NULL, measure_unit = NULL, measure_decimal = 0, ...) {
   quik_opts <- set_quik_opts(df, dimension = dimension, measure = measure, groups = groups, 
                              colors = colors, palette_type = palette_type, 
                              measure_decimal = measure_decimal, measure_unit = measure_unit)
@@ -194,7 +195,7 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
   if (point_size > 0) gg <- gg + geom_point(aes_string(color = quik_opts$groups), size = point_size,
                                             position = p.pos)
   # split to facets if needed
-  if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_by)), scales = 'free', ncol = 1)
+  if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_by)), ...)
   # add colors
   gg <- gg + scale_color_manual(values=quik_opts$colors, guide = quik_opts$legend)
   if (area) gg <- gg + scale_fill_manual(values=quik_opts$colors, guide = FALSE)
@@ -239,11 +240,12 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
 #' @param measure_decimal An integer. The number of decimal places to show.
+#' @param ... Additional parameters to pass on it facet_wrap (e.g. scales = free, ncol = 1)
 #'
 #' @usage quik_points(df, dimension, measure, groups, palette_type,
 #'                         colors, point_size, dim_breaks,
 #'                         facet_by, area, text_size,
-#'                         currency, measure_unit, measure_decimal)
+#'                         currency, measure_unit, measure_decimal, ...)
 #'
 #' @examples 
 #' # Create a line plot from morley data
@@ -256,7 +258,7 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
 quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qualitative',
                        colors = NULL, point_size = 2, dim_breaks = NULL,
                        facet_by = NULL, area = FALSE, text_size = 3,
-                       currency = NULL, measure_unit = NULL, measure_decimal = NULL) {
+                       currency = NULL, measure_unit = NULL, measure_decimal = NULL, ...) {
   quik_opts <- set_quik_opts(df, dimension = dimension, measure = measure, groups = groups, 
                              colors = colors, palette_type = palette_type, 
                              measure_decimal = measure_decimal, measure_unit = measure_unit)
@@ -270,7 +272,7 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
   gg <- ggplot(df, aes_string(x = dimension, y = measure, group = quik_opts$groups))
   gg <- gg + geom_point(aes_string(color = quik_opts$groups), size = point_size)
   # split to facets if needed
-  if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_by)), scales = 'free', ncol = 1)
+  if (!is.null(facet_by)) gg <- gg + facet_wrap(as.formula(paste0('~', facet_by)), ...)
   # add colors
   gg <- gg + scale_color_manual(values=quik_opts$colors, guide = quik_opts$legend)
   if (!is.null(dim_breaks)) {
@@ -338,35 +340,40 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
 quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
                           dotted_line = NULL, solid_line = NULL, text_size = 3,
                           palette_type = 'qualitative', line_colors = "Purple",
-                          currency = NULL, measure_unit = NULL, ...) {
+                          currency = NULL, measure_unit = NULL, measure_decimal = 0, ...) {
   measures <- names(df)[names(df) %in% c(range_low, range_high, bar_fill, solid_line, dotted_line)]
   labels.df <- df[, measures]
-  df[, paste0(measures, '_label')] <- sapply(labels.df, format_label, currency = currency, measure_unit = measure_unit)
+  df[, paste0(measures, '_label')] <- sapply(labels.df, format_label, currency = currency, 
+                                             measure_unit = measure_unit, measure_decimal = measure_decimal)
+  df[, solid_line] <- ifelse(is.na(df[, solid_line]), (df$max + df$min)/2, df[, solid_line])
+  df[, dotted_line] <- ifelse(is.na(df[, dotted_line]), (df$max + df$min)/2, df[, dotted_line])
   bar.color <- ggquik::plot_colors$grid.color
   fill.color <- change_shade(bar.color, -4)
   group.colors <- set_group_colors(df[, group_col], palette_type, line_colors)
   txt.d <- ggquik::plot_colors$text.dark
   gg <- ggplot(df, aes_string(x = group_col, group = group_col, color = group_col))
   if (!is.null(bar_fill)) gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = bar_fill),
-                         color = 'transparent', fill = fill.color, width = 0.4, size = 1, fatten = 0)
+                         color = 'transparent', fill = fill.color, width = 0.3, size = 1, fatten = 0)
   gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = range_high),
-                  color = bar.color, width = 0.4, size = 1, fatten = 0)
+                  color = bar.color, width = 0.3, size = 1, fatten = 0)
   if (!is.null(solid_line)) {
-    gg <- gg + geom_errorbar(aes_string(ymin = solid_line, ymax = solid_line), width = 0.5, size = 1) +
+    gg <- gg + geom_errorbar(aes_string(ymin = solid_line, ymax = solid_line), width = 0.4, size = 1) +
       geom_text(aes_string(y = solid_line, label = paste0(solid_line, '_label')),
                 vjust = -4, color = txt.d, family = set_quik_family(), size = text_size)
   }
   if (!is.null(dotted_line)) {
-    gg <- gg + geom_errorbar(aes_string(ymin = dotted_line, ymax = dotted_line), width = 0.5, size = 1, linetype = 'dashed') +
+    gg <- gg + geom_errorbar(aes_string(ymin = dotted_line, ymax = dotted_line), width = 0.4, size = 1, linetype = 'dashed') +
       geom_text(aes_string(y = dotted_line, label = paste0(dotted_line, '_label')),
-              vjust = -4, color = txt.d, family = set_quik_family(), text_size = 4)
+              vjust = -4, color = txt.d, family = set_quik_family(), size = text_size)
   }
-  gg <- gg + coord_flip() + facet_wrap(~group, scales = 'free', ...)
+  gg <- gg + coord_flip() + # xlim = c(0.75, 1.25), expand = FALSE
+    facet_wrap(as.formula(paste0("~", group_col)), scales = 'free', ...)
   y.labels = waiver()
   if (!is.null(measure_unit)) {
     if (measure_unit == '%') y.labels = scales::percent
   }
-  gg <- gg + scale_y_continuous(breaks = use_limits(), labels = y.labels)
+  gg <- gg + scale_x_discrete(expand = c(-5, -5))
+  gg <- gg + scale_y_continuous(breaks = use_limits(), labels = y.labels, expand = expand_scale(mult = c(.1, .1)))
   gg <- gg + scale_color_manual(values=group.colors)
   return(gg)
 }

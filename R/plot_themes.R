@@ -13,7 +13,7 @@
 #' @param clean_axis A logical. Should the plot axes be cleaned?
 #' @param clean_facet A logical. Should the facet titles be cleaned?
 #' @param legend A string. One of three options: \code{"bottom"},
-#' \code{"right"}, or \code{"none"}. Default is \code{"none"}.
+#' \code{"right"}, or \code{"none"}. Default is \code{"bottom"}.
 #' @param transparent A logical. Should the plot be transparent for saving?
 #' @param ... Parameters to pass on to \code{\link{quik_clean_axis}} such
 #' as \code{axis.title} and \code{axis.text}, or to

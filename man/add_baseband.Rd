@@ -7,9 +7,9 @@
 add_baseband(gg, direction, min, max, bg_color)
 }
 \arguments{
-\item{gg}{The ggplot object on which to add a baseline}
+\item{gg}{The ggplot object on which to add a baseband}
 
-\item{direction}{The direction on which to add the baseline: \code{x}, or \code{y}}
+\item{direction}{The direction on which to add the baseband: \code{x}, or \code{y}}
 
 \item{min}{The location to start the band}
 

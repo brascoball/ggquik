@@ -17,6 +17,8 @@ quik_bars(df, dimension, measure, groups, position,
 
 \item{measure}{The column containing numerical values to be plotted}
 
+\item{groups}{If a stacked or dodged bar, the column containing the groups}
+
 \item{text_size}{A numeric. The size of the text within the bars (default is 3)}
 
 \item{alt_text_size}{A numeric. The size of the alternative text (default is 3)}
@@ -48,9 +50,7 @@ quik_bars(df, dimension, measure, groups, position,
 
 \item{text_cutoff}{A number. If text values below a certain number should not be included.}
 
-\item{...}{Additional parameters to pass on it facet_wrap}
-
-\item{groups}{If a stacked or dodged bar, the column containing the groups}
+\item{...}{Additional parameters to pass on it facet_wrap (e.g. scales = free, ncol = 1)}
 
 \item{bar_type}{If groups, whether to \code{"stack"} (default) or \code{"dodge"} the groups.}
 }
@@ -61,7 +61,7 @@ ggquik has specific standards for plots, and
 \examples{
 # Create a bar plot from morley data
 data(morley)
-ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', bar_groups = 'Expt')
+ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', groups = 'Expt')
 quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 
 }

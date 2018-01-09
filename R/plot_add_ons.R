@@ -27,8 +27,8 @@ add_baseline = function(gg, direction, intercept) {
 #' Add a horizontal or vertical background band (\code{geom_rect}) to a plot. 
 #' This adds the band under most existing layers.
 #'
-#' @param gg The ggplot object on which to add a baseline
-#' @param direction The direction on which to add the baseline: \code{x}, or \code{y}
+#' @param gg The ggplot object on which to add a baseband
+#' @param direction The direction on which to add the baseband: \code{x}, or \code{y}
 #' @param min The location to start the band
 #' @param max The location to end the band
 #' @param bg_color The background color for the band area. Default is \code{"Green 4"}
@@ -50,6 +50,27 @@ add_baseband = function(gg, direction, min, max, bg_color = "Green 4") {
   # move the base band under most layers
   # if (class(gg$layers[[1]]$geom)[[1]] == 'GeomLine') gg$layers <- c(gg$layers[1], gg$layers[(le-2):le], gg$layers[2:(le-3)])
   gg$layers <- c(gg$layers[(le-2):le], gg$layers[1:(le-3)])
+  return(gg)
+}
+
+
+#' Add a backbar to a plot.
+#'
+#' Add an additional set of bars (\code{geom_bars}) to a plot. 
+#' This adds the bars under most existing layers, and isn't added
+#' to the amount of any current bars.
+#'
+#' @param gg The ggplot object on which to add backbars
+#' @param measure The column in the original data frame containing the backband measure.
+#' @param bg_color The backbars color. Default is \code{"Green 4"}
+#'
+#' @usage add_backbar(gg, measure, bg_color)
+#'
+#' @export
+add_backbar = function(gg, measure, bg_color = "Gray 4") {
+  gg <- gg + geom_bar(aes_string(y = measure), fill = redhat_colors(bg_color), stat = 'identity', width = 0.65)
+  le <- length(gg$layers)
+  gg$layers <- c(gg$layers[le], gg$layers[1:(le-1)])
   return(gg)
 }
 
