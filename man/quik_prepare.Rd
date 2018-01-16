@@ -4,7 +4,8 @@
 \alias{quik_prepare}
 \title{Prep a data frame for ggquik plotting}
 \usage{
-quik_prepare(df, dimension, measure, plot_type, facet_by, background,
+quik_prepare(df, dimension, measure, plot_type, groups, 
+                       facet_by, background,
                        currency, measure_unit, measure_decimal,
                        sum_label, text_cutoff)
 }
@@ -16,6 +17,8 @@ quik_prepare(df, dimension, measure, plot_type, facet_by, background,
 \item{measure}{The data frame column with the numerical values to plot}
 
 \item{plot_type}{A string. The type of plot (\code{"bar"} or \code{"line"}).}
+
+\item{groups}{The column containing the different groups of bars, lines, or points.}
 
 \item{facet_by}{The data frame column with the facet data (if necessary).}
 

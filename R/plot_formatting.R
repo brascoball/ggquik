@@ -96,6 +96,7 @@ format_label = function(measure, currency = NULL, measure_unit = NULL,
 #' @param dimension The column containing the values to compare across (e.g. quarters, types)
 #' @param measure The data frame column with the numerical values to plot
 #' @param plot_type A string. The type of plot (\code{"bar"} or \code{"line"}).
+#' @param groups The column containing the different groups of bars, lines, or points.
 #' @param facet_by The data frame column with the facet data (if necessary).
 #' @param background A logical. Is a background total necessary?
 #' @param currency A string, usually \code{$}
@@ -104,14 +105,16 @@ format_label = function(measure, currency = NULL, measure_unit = NULL,
 #' @param sum_label Will there be a special group label? Sum from which column?
 #' @param text_cutoff A number. If text values below a certain number should not be included.
 #'
-#' @usage quik_prepare(df, dimension, measure, plot_type, facet_by, background,
+#' @usage quik_prepare(df, dimension, measure, plot_type, groups, 
+#'                        facet_by, background,
 #'                        currency, measure_unit, measure_decimal,
 #'                        sum_label, text_cutoff)
 #'
 #' @return Returns a new data frame with additional columns based on selections
 #'
 #' @export
-quik_prepare = function(df, dimension, measure, plot_type, facet_by = NULL, background = FALSE,
+quik_prepare = function(df, dimension, measure, plot_type, groups = NULL,
+                        facet_by = NULL, background = FALSE,
                            currency = NULL, measure_unit = NULL, measure_decimal = 0,
                            sum_label = NULL, text_cutoff = NULL) {
   position_text <- alt_label <- NULL
@@ -133,6 +136,7 @@ quik_prepare = function(df, dimension, measure, plot_type, facet_by = NULL, back
     dt[, background := sum(get(measure)), by = get(dimension)]
     setkeyv(dt, facet_by)
   }
+  dt <- dt[order(get(c(groups, facet_by, dimension))), ]
   df <- data.frame(dt, check.names = FALSE)
   df$measure_label <- format_label(df[, measure], currency = currency,
                                       measure_unit = measure_unit, measure_decimal = measure_decimal)

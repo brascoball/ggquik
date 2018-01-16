@@ -10,7 +10,7 @@
 #' @param dimension Usually the x-axis, values like "quarter" or "account type"
 #' @param measure The column containing numerical values to be plotted
 #' @param groups If a stacked or dodged bar, the column containing the groups
-#' @param bar_type If groups, whether to \code{"stack"} (default) or \code{"dodge"} the groups.
+#' @param position If groups, whether to \code{"stack"} (default) or \code{"dodge"} the groups.
 #' @param text_size A numeric. The size of the text within the bars (default is 3)
 #' @param alt_text_size A numeric. The size of the alternative text (default is 3)
 #' @param alt_label The column containing an alternate label (if any)
@@ -51,11 +51,11 @@ quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
   bar_width <- 0.65
   if(is.null(measure_decimal)) measure_decimal <- set_decimal(df[, measure], measure_unit)
   if(background & is.null(facet_by)) stop("facet_by must be supplied if background = TRUE")
-  df <- quik_prepare(df, dimension = dimension, measure = measure,
-                        facet_by = facet_by, background = background,
-                        plot_type = 'bar', currency = currency,
-                        measure_unit = measure_unit, measure_decimal = measure_decimal,
-                        sum_label = alt_label, text_cutoff = text_cutoff)
+  df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'bar',
+                     groups = groups, facet_by = facet_by, background = background,
+                     currency = currency, measure_unit = measure_unit, 
+                     measure_decimal = measure_decimal, 
+                     sum_label = alt_label, text_cutoff = text_cutoff)
   fill.colors <- set_group_colors(df[, groups], palette_type, colors)
   if (palette_type == 'diverging') {
     keep_labels <- levels(df[, groups])[c(1, length(levels(df[, groups])))]
@@ -178,7 +178,8 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
     if(class(df[, groups]) != 'factor') df[, groups] <- as.factor(df[, groups])
   }
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
-                     currency = currency, measure_unit = measure_unit, measure_decimal = quik_opts$measure_decimal)
+                     groups = groups, currency = currency, measure_unit = measure_unit, 
+                     measure_decimal = quik_opts$measure_decimal)
   # create initial plot
   gg <- ggplot(df, aes_string(x = dimension, y = measure, group = quik_opts$groups))
   # add lines or area:
@@ -267,7 +268,8 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
     if(class(df[, groups]) != 'factor') df[, groups] <- as.factor(df[, groups])
   }
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
-                     currency = currency, measure_unit = measure_unit, measure_decimal = quik_opts$measure_decimal)
+                     groups = groups, currency = currency, measure_unit = measure_unit, 
+                     measure_decimal = quik_opts$measure_decimal)
   # create initial plot
   gg <- ggplot(df, aes_string(x = dimension, y = measure, group = quik_opts$groups))
   gg <- gg + geom_point(aes_string(color = quik_opts$groups), size = point_size)
@@ -319,12 +321,13 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
 #' "green", "purple", "teal")
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
+#' @param measure_decimal An integer. The number of decimal places to show.
 #' @param ... Parameters to pass on to facet_wrap, such as \code{nrow} or \code{ncol}
 #'
 #' @usage quik_bullets(df, group_col, range_low, range_high, bar_fill,
 #'                         dotted_line, solid_line, text_size,
 #'                         palette_type, line_colors,
-#'                         currency, measure_unit, ...)
+#'                         currency, measure_unit, measure_decimal, ...)
 #'                         
 #' @examples
 #' # load a sample data frame
@@ -351,20 +354,21 @@ quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
   fill.color <- change_shade(bar.color, -4)
   group.colors <- set_group_colors(df[, group_col], palette_type, line_colors)
   txt.d <- ggquik::plot_colors$text.dark
+  txt.sd <- change_shade(txt.d, 2)
   gg <- ggplot(df, aes_string(x = group_col, group = group_col, color = group_col))
   if (!is.null(bar_fill)) gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = bar_fill),
-                         color = 'transparent', fill = fill.color, width = 0.3, size = 1, fatten = 0)
+                         color = 'transparent', fill = fill.color, width = 0.6, size = 1, fatten = 0)
   gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = range_high),
-                  color = bar.color, width = 0.3, size = 1, fatten = 0)
+                  color = bar.color, width = 0.6, size = 1, fatten = 0)
   if (!is.null(solid_line)) {
-    gg <- gg + geom_errorbar(aes_string(ymin = solid_line, ymax = solid_line), width = 0.4, size = 1) +
-      geom_text(aes_string(y = solid_line, label = paste0(solid_line, '_label')),
-                vjust = -4, color = txt.d, family = set_quik_family(), size = text_size)
+    gg <- gg + geom_errorbar(aes_string(ymin = solid_line, ymax = solid_line), width = 0.8, size = 1) +
+      geom_text(aes_string(x = 2, y = solid_line, label = paste0(solid_line, '_label')),
+                vjust = 3, color = txt.sd, family = set_quik_family(), size = text_size)
   }
   if (!is.null(dotted_line)) {
-    gg <- gg + geom_errorbar(aes_string(ymin = dotted_line, ymax = dotted_line), width = 0.4, size = 1, linetype = 'dashed') +
-      geom_text(aes_string(y = dotted_line, label = paste0(dotted_line, '_label')),
-              vjust = -4, color = txt.d, family = set_quik_family(), size = text_size)
+    gg <- gg + geom_errorbar(aes_string(ymin = dotted_line, ymax = dotted_line), width = 0.8, size = 1, linetype = 'dashed') +
+      geom_text(aes_string(x = 2, y = dotted_line, label = paste0(dotted_line, '_label')),
+              vjust = 3, color = txt.d, family = set_quik_family(), size = text_size)
   }
   gg <- gg + coord_flip() + # xlim = c(0.75, 1.25), expand = FALSE
     facet_wrap(as.formula(paste0("~", group_col)), scales = 'free', ...)
@@ -372,7 +376,6 @@ quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
   if (!is.null(measure_unit)) {
     if (measure_unit == '%') y.labels = scales::percent
   }
-  gg <- gg + scale_x_discrete(expand = c(-5, -5))
   gg <- gg + scale_y_continuous(breaks = use_limits(), labels = y.labels, expand = expand_scale(mult = c(.1, .1)))
   gg <- gg + scale_color_manual(values=group.colors)
   return(gg)

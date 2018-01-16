@@ -7,7 +7,7 @@
 quik_bullets(df, group_col, range_low, range_high, bar_fill,
                         dotted_line, solid_line, text_size,
                         palette_type, line_colors,
-                        currency, measure_unit, ...)
+                        currency, measure_unit, measure_decimal, ...)
 }
 \arguments{
 \item{df}{The data frame containing plot data}
@@ -36,6 +36,8 @@ quik_bullets(df, group_col, range_low, range_high, bar_fill,
 \item{currency}{A string, usually \code{$}}
 
 \item{measure_unit}{A string. Can be \code{\%}, \code{K}, or \code{M}}
+
+\item{measure_decimal}{An integer. The number of decimal places to show.}
 
 \item{...}{Parameters to pass on to facet_wrap, such as \code{nrow} or \code{ncol}}
 }

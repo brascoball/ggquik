@@ -58,7 +58,7 @@ quik_theme = function(gg, clean_grid = TRUE, clean_axis = TRUE, clean_facet = NU
 #' @export
 quik_clean_axis = function(gg, axis.title = NULL, axis.text = NULL) {
   blnk <- element_blank()
-  text.col <- ggquik::plot_colors$text.color
+  text.col <- ggquik::plot_colors$text.dark
   txt <- element_text(color=text.col, family="Overpass")
 
   gg <- gg + theme(axis.title=txt)
@@ -115,8 +115,9 @@ quik_clean_grid = function(gg, grid.lines = NULL) {
 quik_clean_facet = function(gg) {
   gg <- gg +
     theme(strip.background = element_blank(), panel.spacing = unit(1.25, "cm"),
-          strip.text.x = element_text(size = 10, colour = ggquik::plot_colors$text.color,
-                                      family = 'Overpass', margin = margin(b = 7)))
+          strip.text.x = element_text(size = 14, family = 'Overpass',
+                                      colour = change_shade(ggquik::plot_colors$text.dark, 2),
+                                      margin = margin(b = 7)))
   return(gg)
 }
 
@@ -142,7 +143,7 @@ quik_legend = function(gg, legend_position) {
             # panel.margin = unit(x = c(0.5, 0.5, 0.5, 0.5), "cm"),
             legend.title=element_blank(),
             legend.text=element_text(family = "Overpass",
-                                     color = ggquik::plot_colors$text.color, size=10))
+                                     color = ggquik::plot_colors$text.dark, size=10))
   return(gg)
 }
 
