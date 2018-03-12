@@ -136,7 +136,9 @@ quik_prepare = function(df, dimension, measure, plot_type, groups = NULL,
     dt[, background := sum(get(measure)), by = get(dimension)]
     setkeyv(dt, facet_by)
   }
-  dt <- dt[order(get(c(groups, facet_by, dimension))), ]
+  # Changed to facet_by, groups on 3/9/2018 because CS Revenue faceted by region grouped by segment
+  # text was on wrong points. Originally was groups, facet_by.
+  dt <- dt[order(get(c(facet_by, groups, dimension))), ]
   df <- data.frame(dt, check.names = FALSE)
   df$measure_label <- format_label(df[, measure], currency = currency,
                                       measure_unit = measure_unit, measure_decimal = measure_decimal)

@@ -62,15 +62,42 @@ add_baseband = function(gg, direction, min, max, bg_color = "Green 4") {
 #'
 #' @param gg The ggplot object on which to add backbars
 #' @param measure The column in the original data frame containing the backband measure.
-#' @param bg_color The backbars color. Default is \code{"Green 4"}
+#' @param bg_color The backbars color. Default is \code{"Gray 4"}
 #'
-#' @usage add_backbar(gg, measure, bg_color)
+#' @usage add_backbar(gg, measure, bg_color = "Gray 4")
 #'
 #' @export
 add_backbar = function(gg, measure, bg_color = "Gray 4") {
   gg <- gg + geom_bar(aes_string(y = measure), fill = redhat_colors(bg_color), stat = 'identity', width = 0.65)
   le <- length(gg$layers)
   gg$layers <- c(gg$layers[le], gg$layers[1:(le-1)])
+  return(gg)
+}
+
+
+#' Add backtext to a plot.
+#'
+#' Add an additional set of text (\code{geom_text}) to a plot. Works best
+#' when using with add_backbar.
+#'
+#' @param gg The ggplot object on which to add backbars
+#' @param measure The column in the original data frame containing the backband measure.
+#' @param text_size The backtext size. Default is \code{3}.
+#'
+#' @usage add_backtext(gg, measure, text_size = 3)
+#'
+#' @export
+add_backtext = function(gg, measure, text_size = 3) {
+  # these MIGHT be percents, but can't think of an example, so 
+  # it's probably ok that we're overwriting the y coding to a waiver.
+  y.breaks = y.labels = waiver()
+  y.expand = expand_scale(mult = c(0, .1))
+  gg <- gg + geom_text(aes_string(y = measure, label = measure), 
+                       vjust = -0.5, size = text_size)
+  gg <- gg + scale_y_continuous(breaks = y.breaks, labels = y.labels, expand = y.expand)
+  # since there is nothing behind these labels, likely don't need to move them.
+  # le <- length(gg$layers)
+  # gg$layers <- c(gg$layers[le], gg$layers[1:(le-1)])
   return(gg)
 }
 

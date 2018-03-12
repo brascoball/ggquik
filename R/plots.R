@@ -178,8 +178,8 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
     if(class(df[, groups]) != 'factor') df[, groups] <- as.factor(df[, groups])
   }
   df <- quik_prepare(df, dimension = dimension, measure = measure, plot_type = 'line',
-                     groups = groups, currency = currency, measure_unit = measure_unit, 
-                     measure_decimal = quik_opts$measure_decimal)
+                     groups = groups, facet_by = facet_by, currency = currency, 
+                     measure_unit = measure_unit, measure_decimal = quik_opts$measure_decimal)
   # create initial plot
   gg <- ggplot(df, aes_string(x = dimension, y = measure, group = quik_opts$groups))
   # add lines or area:
