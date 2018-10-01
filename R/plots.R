@@ -319,15 +319,18 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
 #' @param line_colors A string. What color should be used for the lines (e.g.
 #' "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
 #' "green", "purple", "teal")
+#' @param fill_color A string. What color should be used for the bar (e.g.
+#' "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
+#' "green", "purple", "teal")
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
 #' @param measure_decimal An integer. The number of decimal places to show.
 #' @param ... Parameters to pass on to facet_wrap, such as \code{nrow} or \code{ncol}
 #'
-#' @usage quik_bullets(df, group_col, range_low, range_high, bar_fill,
-#'                         dotted_line, solid_line, text_size,
-#'                         palette_type, line_colors,
-#'                         currency, measure_unit, measure_decimal, ...)
+#' @usage quik_bullets(df, group_col, range_low, range_high, bar_fill = NULL,
+#'                      dotted_line = NULL, solid_line = NULL, text_size = 3,
+#'                      palette_type = 'qualitative', line_colors = "Purple", fill_color = NULL,
+#'                      currency = NULL, measure_unit = NULL, measure_decimal = 0, ...)
 #'                         
 #' @examples
 #' # load a sample data frame
@@ -342,22 +345,28 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
 #' @export
 quik_bullets = function(df, group_col, range_low, range_high, bar_fill = NULL,
                           dotted_line = NULL, solid_line = NULL, text_size = 3,
-                          palette_type = 'qualitative', line_colors = "Purple",
+                          palette_type = 'qualitative', line_colors = "Purple", fill_color = NULL,
                           currency = NULL, measure_unit = NULL, measure_decimal = 0, ...) {
   measures <- names(df)[names(df) %in% c(range_low, range_high, bar_fill, solid_line, dotted_line)]
   labels.df <- df[, measures]
   df[, paste0(measures, '_label')] <- sapply(labels.df, format_label, currency = currency, 
                                              measure_unit = measure_unit, measure_decimal = measure_decimal)
-  df[, solid_line] <- ifelse(is.na(df[, solid_line]), (df$max + df$min)/2, df[, solid_line])
-  df[, dotted_line] <- ifelse(is.na(df[, dotted_line]), (df$max + df$min)/2, df[, dotted_line])
+  df[, solid_line] <- ifelse(is.na(df[, solid_line]), df$min, df[, solid_line])
+  df[, dotted_line] <- ifelse(is.na(df[, dotted_line]), df$min, df[, dotted_line])
   bar.color <- ggquik::plot_colors$grid.color
-  fill.color <- change_shade(bar.color, -4)
+  if (is.null(fill_color)) {
+    fill_color <- change_shade(bar.color, -4)
+  } else {
+    fill_color <- redhat_colors(fill_color)
+  }
   group.colors <- set_group_colors(df[, group_col], palette_type, line_colors)
   txt.d <- ggquik::plot_colors$text.dark
   txt.sd <- change_shade(txt.d, 2)
   gg <- ggplot(df, aes_string(x = group_col, group = group_col, color = group_col))
   if (!is.null(bar_fill)) gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = bar_fill),
-                         color = 'transparent', fill = fill.color, width = 0.6, size = 1, fatten = 0)
+                         color = 'transparent', fill = fill_color, width = 0.6, size = 1, fatten = 0) +
+      geom_text(aes_string(x = 2, y = bar_fill, label = paste0(bar_fill, '_label')),
+                vjust = 4, hjust = 1.25, color = pick_text_color(fill_color), family = set_quik_family(), size = text_size)
   gg <- gg + geom_crossbar(aes_string(y = range_low, ymin = range_low, ymax = range_high),
                   color = bar.color, width = 0.6, size = 1, fatten = 0)
   if (!is.null(solid_line)) {

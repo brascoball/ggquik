@@ -72,7 +72,7 @@ format_label = function(measure, currency = NULL, measure_unit = NULL,
   } else if (measure_unit == "M") {
     mult = 1/1000000
   }
-  measure_label <- paste0(round(measure*mult, measure_decimal), measure_unit)
+  measure_label <- ifelse(is.na(measure), "NA", paste0(round(measure*mult, measure_decimal), measure_unit))
   if (!is.null(currency)) measure_label <- paste0(currency, measure_label)
   if (parenthesis) measure_label <- paste0("(", measure_label, ")")
   return(measure_label)
