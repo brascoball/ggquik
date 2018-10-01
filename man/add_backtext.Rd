@@ -12,6 +12,8 @@ add_backtext(gg, measure, text_size = 3)
 \item{measure}{The column in the original data frame containing the backband measure.}
 
 \item{text_size}{The backtext size. Default is \code{3}.}
+
+\item{vertical_adjust}{The text vertical adjustment. Default is \code{-0.5}.}
 }
 \description{
 Add an additional set of text (\code{geom_text}) to a plot. Works best

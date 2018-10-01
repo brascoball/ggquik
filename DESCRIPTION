@@ -1,7 +1,7 @@
 Package: ggquik
 Type: Package
 Title: Quick Plotting ggplot2 Wrapper
-Version: 0.1.1.0
+Version: 0.1.1.2
 Author: Don Chesworth
 Maintainer: Don Chesworth <dcheswor@redhat.com>
 Description: Using ggplot2, create quick bar, line, and bullet plots

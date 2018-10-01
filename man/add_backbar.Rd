@@ -4,14 +4,16 @@
 \alias{add_backbar}
 \title{Add a backbar to a plot.}
 \usage{
-add_backbar(gg, measure, bg_color = "Gray 4")
+add_backbar(gg, measure, bg_color = "Gray 4", width = 0.65)
 }
 \arguments{
 \item{gg}{The ggplot object on which to add backbars}
 
 \item{measure}{The column in the original data frame containing the backband measure.}
 
-\item{bg_color}{The backbars color. Default is \code{"Gray 4"}}
+\item{bg_color}{The backbars color. Default is \code{"Gray 4"}.}
+
+\item{width}{The backbars width Default is \code{0.65}.}
 }
 \description{
 Add an additional set of bars (\code{geom_bars}) to a plot. 
