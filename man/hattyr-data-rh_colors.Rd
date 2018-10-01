@@ -4,7 +4,7 @@
 \name{rh_colors}
 \alias{rh_colors}
 \title{Red Hat branded colors.}
-\format{A data frame with 72 rows and 3 variables:
+\format{A data frame with 88 rows and 3 variables:
  \describe{
       \item{name}{color name}
       \item{color}{hexidecimal number}

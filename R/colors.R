@@ -103,3 +103,17 @@ change_shade <- function(hex_color, n) {
   new.row <- curr.row + n
   return(cols[new.row, 'color'])
 }
+
+#' Get the hex of a redhat color in rgb
+#'
+#' Most colors have six shades. This function provides the color that
+#' is "n" shades away.
+#'
+#' @param r The red value. Default is 0.
+#' @param g The green value. Default is 0.
+#' @param b The blue value. Default is 0.
+#'
+#' @export
+redhat_hex <- function(r=0, g=0, b=0) {
+  return(substr(rgb(r, g, b, 0, maxColorValue = 255), 1, 7))
+}
