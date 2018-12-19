@@ -47,4 +47,3 @@ a data frame, and optionally:
  \item{Sets the positions for text that will be placed in a bar chart}
 }
 }
-

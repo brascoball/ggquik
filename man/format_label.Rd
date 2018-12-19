@@ -21,4 +21,3 @@ format_label(measure, currency, measure_unit,
 \description{
 This will round the data to the measure unit, add a prefix, and add a suffix
 }
-

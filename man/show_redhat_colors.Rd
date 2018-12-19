@@ -14,4 +14,3 @@ Show available Red Hat colors.
 show_redhat_colors()
 
 }
-

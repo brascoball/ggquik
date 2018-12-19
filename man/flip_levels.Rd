@@ -16,4 +16,3 @@ A column to be added to a dataframe
 Sometimes plots require levels to be reversed. This function will flip the order
 of factors.
 }
-

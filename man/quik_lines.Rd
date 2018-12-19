@@ -4,10 +4,11 @@
 \alias{quik_lines}
 \title{Plot a quik line plot}
 \usage{
-quik_lines(df, dimension, measure, groups, palette_type,
+quik_lines(df, dimension, measure, groups, palette_type = 'qualitative',
                         colors, point_size, dim_breaks,
-                        facet_by, area, text_size,
-                        currency, measure_unit, measure_decimal, ...)
+                        facet_by, area = FALSE, text_size = 3,
+                        alt_text_size = 4, alt_label,
+                        currency, measure_unit, measure_decimal = 0, ...)
 }
 \arguments{
 \item{df}{The data frame containing plot data}
@@ -33,6 +34,10 @@ quik_lines(df, dimension, measure, groups, palette_type,
 
 \item{text_size}{The size of the label text size. Default is 3}
 
+\item{alt_text_size}{A numeric. The size of the alternative text (default is 3)}
+
+\item{alt_label}{The column containing an alternate label (if any)}
+
 \item{currency}{A string, usually \code{$}}
 
 \item{measure_unit}{A string. Can be \code{\%}, \code{K}, or \code{M}}
@@ -51,4 +56,3 @@ ggq <- quik_lines(morley, dimension = 'Run', measure = 'Speed', groups = 'Expt')
 quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 
 }
-

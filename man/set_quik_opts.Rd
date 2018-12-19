@@ -28,4 +28,3 @@ set_quik_opts(df, dimension, measure, groups, palette_type, colors,
 \description{
 Set various quik options for plotting
 }
-

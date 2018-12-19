@@ -27,4 +27,3 @@ on the type of colors desired. This is a
 sub function for \code{\link{quik_bars}} and
 \code{\link{quik_bullets}}.
 }
-

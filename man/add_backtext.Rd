@@ -4,7 +4,7 @@
 \alias{add_backtext}
 \title{Add backtext to a plot.}
 \usage{
-add_backtext(gg, measure, text_size = 3)
+add_backtext(gg, measure, text_size = 3, vertical_adjust = -0.5)
 }
 \arguments{
 \item{gg}{The ggplot object on which to add backbars}
@@ -19,4 +19,3 @@ add_backtext(gg, measure, text_size = 3)
 Add an additional set of text (\code{geom_text}) to a plot. Works best
 when using with add_backbar.
 }
-

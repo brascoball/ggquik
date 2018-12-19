@@ -20,4 +20,3 @@ Usually called by quik_theme automatically, this function is used to
 either update the font for the axis titles and text, or remove them.
 It can do this for both axes, or one at a time.
 }
-

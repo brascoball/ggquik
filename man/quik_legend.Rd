@@ -16,4 +16,3 @@ of three options: \code{"bottom"}, \code{"right"}, or
 \description{
 Move the legend to the bottom for a ggplot theme
 }
-

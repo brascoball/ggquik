@@ -17,4 +17,3 @@ Usually called by quik_theme automatically, this function is used to
 clear the gray grid background, and either update the grid lines
 or remove them. It can do this for both axes, or just one.
 }
-

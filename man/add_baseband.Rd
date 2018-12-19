@@ -21,4 +21,3 @@ add_baseband(gg, direction, min, max, bg_color)
 Add a horizontal or vertical background band (\code{geom_rect}) to a plot. 
 This adds the band under most existing layers.
 }
-

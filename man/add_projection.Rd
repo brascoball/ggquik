@@ -19,4 +19,3 @@ add_projection(gg, projection, confidence, label_final)
 After creating a line plot using \code{quik_lines},
 this function will add a confidence interval
 }
-

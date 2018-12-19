@@ -16,4 +16,3 @@ of the shade change.}
 Most colors have six shades. This function provides the color that
 is "n" shades away.
 }
-

@@ -17,4 +17,3 @@ redhat_hex(r = 0, g = 0, b = 0)
 Most colors have six shades. This function provides the color that
 is "n" shades away.
 }
-

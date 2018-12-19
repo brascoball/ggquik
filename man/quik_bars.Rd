@@ -65,4 +65,3 @@ ggq <- quik_bars(morley, dimension = 'Run', measure = 'Speed', groups = 'Expt')
 quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 
 }
-

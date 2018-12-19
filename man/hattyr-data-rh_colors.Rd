@@ -26,4 +26,3 @@ data(rh_colors)
 
 }
 \keyword{datasets}
-

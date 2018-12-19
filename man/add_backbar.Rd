@@ -20,4 +20,3 @@ Add an additional set of bars (\code{geom_bars}) to a plot.
 This adds the bars under most existing layers, and isn't added
 to the amount of any current bars.
 }
-

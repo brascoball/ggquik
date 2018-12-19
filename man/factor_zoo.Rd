@@ -22,4 +22,3 @@ This will add in any missing dates with zeroes, then change the yearmon/yearqtr
 dimension into a factor so that it can be used in order like all other
 factor dimensions.
 }
-

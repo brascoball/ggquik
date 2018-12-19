@@ -34,4 +34,3 @@ the legend to the bottom, and make all white elements transparent for
 universal use. \code{clean_facet} can be set to TRUE to clean ugly
 facet titles.
 }
-

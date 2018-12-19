@@ -17,4 +17,3 @@ add_baseline(gg, direction, intercept)
 Add a horizontal or vertical baseline to a plot. This adds the baseline
 under most layers.
 }
-

@@ -22,4 +22,3 @@ each to have their own scale ("free")}
 After creating your own ggplot, you may want to separate a plot by groups into
 two plots. This is done by faceting.
 }
-

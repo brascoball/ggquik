@@ -52,4 +52,3 @@ ggq <- quik_points(morley, dimension = 'Run', measure = 'Speed',
 quik_theme(ggq, axis.text = 'y', axis.title = c('x', 'y'))
 
 }
-

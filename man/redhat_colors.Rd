@@ -27,4 +27,3 @@ z <- redhat_colors("Purple", partial = TRUE)
 non_grays <- redhat_colors(c("Gray", "Black", "White"), partial = TRUE, exclude = TRUE)
 
 }
-

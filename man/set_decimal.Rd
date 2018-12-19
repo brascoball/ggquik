@@ -14,4 +14,3 @@ set_decimal(measure, measure_unit)
 \description{
 Set the decimal for the plot text
 }
-

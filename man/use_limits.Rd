@@ -12,4 +12,3 @@ the given breaks for a continuous scale and returns only
 the limits based on the data. Currently only used as a
 sub function for \code{\link{quik_bullets}}
 }
-

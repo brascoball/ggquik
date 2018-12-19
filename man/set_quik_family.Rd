@@ -11,4 +11,3 @@ This is a function will download the Overpass font from
 \url{https://fonts.google.com/} if necessary, then set it as 
 the font using showtext.
 }
-

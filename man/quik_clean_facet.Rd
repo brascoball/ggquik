@@ -12,4 +12,3 @@ quik_clean_facet(gg)
 \description{
 Clean the facet titles in a ggplot theme
 }
-

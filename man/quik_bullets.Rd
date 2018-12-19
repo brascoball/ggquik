@@ -4,10 +4,11 @@
 \alias{quik_bullets}
 \title{Plot a quik bullet plot}
 \usage{
-quik_bullets(df, group_col, range_low, range_high, bar_fill,
-                        dotted_line, solid_line, text_size,
-                        palette_type, line_colors,
-                        currency, measure_unit, measure_decimal, ...)
+quik_bullets(df, group_col, range_low, range_high, bar_fill = NULL,
+                     dotted_line = NULL, solid_line = NULL, text_size = 3,
+                     palette_type = 'qualitative', line_colors = "Purple", 
+                     fill_color = NULL, currency = NULL, 
+                     measure_unit = NULL, measure_decimal = 0, ...)
 }
 \arguments{
 \item{df}{The data frame containing plot data}
@@ -30,6 +31,10 @@ quik_bullets(df, group_col, range_low, range_high, bar_fill,
 \code{"sequential"}, and \code{"qualitative"}. Default is \code{"qualitative"}.}
 
 \item{line_colors}{A string. What color should be used for the lines (e.g.
+"gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
+"green", "purple", "teal")}
+
+\item{fill_color}{A string. What color should be used for the bar (e.g.
 "gray", "red", "dark red", "blue", "dark blue", "light blue", gold",
 "green", "purple", "teal")}
 
@@ -59,4 +64,3 @@ ggq <- quik_bullets(df, group_col = 'group', range_low = 'low', range_high = 'hi
 quik_theme(ggq, axis.text = 'x')
 
 }
-

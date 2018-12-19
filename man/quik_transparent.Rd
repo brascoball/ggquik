@@ -12,4 +12,3 @@ quik_transparent(gg)
 \description{
 Make a ggplot theme transparent
 }
-

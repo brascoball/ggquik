@@ -28,4 +28,3 @@ data(plot_colors)
 
 }
 \keyword{datasets}
-
