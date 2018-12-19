@@ -109,6 +109,8 @@ change_shade <- function(hex_color, n) {
 #' Most colors have six shades. This function provides the color that
 #' is "n" shades away.
 #'
+#' @importFrom grDevices rgb
+#'
 #' @param r The red value. Default is 0.
 #' @param g The green value. Default is 0.
 #' @param b The blue value. Default is 0.

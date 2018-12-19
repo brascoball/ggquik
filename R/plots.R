@@ -61,7 +61,7 @@ quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
     keep_labels <- levels(df[, groups])[c(1, length(levels(df[, groups])))]
     df[!(df[, groups] %in% keep_labels), 'measure_label'] <- NA
   }
-  txt.l <- ggquik::plot_colors$text.light
+  txt.l <- ggquik::plot_colors$text.dark
   txt.d <- ggquik::plot_colors$text.dark
   bg.f <- ggquik::plot_colors$background.fill
   if (flip_plot) {
@@ -149,15 +149,18 @@ quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
 #' @param facet_by The column containing the group to facet the plots (if desired).
 #' @param area A logical. Should the plot be drawn as an area plot?
 #' @param text_size The size of the label text size. Default is 3
+#' @param alt_text_size A numeric. The size of the alternative text (default is 3)
+#' @param alt_label The column containing an alternate label (if any)
 #' @param currency A string, usually \code{$}
 #' @param measure_unit A string. Can be \code{\%}, \code{K}, or \code{M}
 #' @param measure_decimal An integer. The number of decimal places to show.
 #' @param ... Additional parameters to pass on it facet_wrap (e.g. scales = free, ncol = 1)
 #'
-#' @usage quik_lines(df, dimension, measure, groups, palette_type,
+#' @usage quik_lines(df, dimension, measure, groups, palette_type = 'qualitative',
 #'                         colors, point_size, dim_breaks,
-#'                         facet_by, area, text_size,
-#'                         currency, measure_unit, measure_decimal, ...)
+#'                         facet_by, area = FALSE, text_size = 3,
+#'                         alt_text_size = 4, alt_label,
+#'                         currency, measure_unit, measure_decimal = 0, ...)
 #'
 #' @examples 
 #' # Create a line plot from morley data
@@ -169,6 +172,7 @@ quik_bars = function(df, dimension, measure, groups = NULL, position = 'stack',
 quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qualitative',
                         colors = NULL, point_size = 0, dim_breaks = NULL,
                         facet_by = NULL, area = FALSE, text_size = 3,
+                        alt_text_size = 4, alt_label = NULL, 
                         currency = NULL, measure_unit = NULL, measure_decimal = 0, ...) {
   quik_opts <- set_quik_opts(df, dimension = dimension, measure = measure, groups = groups, 
                              colors = colors, palette_type = palette_type, 
@@ -201,12 +205,24 @@ quik_lines = function(df, dimension, measure, groups = NULL, palette_type = 'qua
   gg <- gg + scale_color_manual(values=quik_opts$colors, guide = quik_opts$legend)
   if (area) gg <- gg + scale_fill_manual(values=quik_opts$colors, guide = FALSE)
   # add dimension breaks if necessary
+  if (!is.null(alt_label)) {
+    x.lab <- length(unique(df[, dimension])) + 0.3
+    h.just <- 0
+    v.just <- 0.2
+    x.expand <- expand_scale(add = c(0.5, 2.5))
+    gg <- gg + geom_text(data=unique(df[df[,dimension] == max(df[, dimension]), c(dimension, facet_by, alt_label, measure)]),
+                         aes_string(x = x.lab, y = measure, label = alt_label), hjust = h.just, vjust = v.just,
+                         color = quik_opts$txt.d, family = set_quik_family(), size = alt_text_size)
+  } else {
+    x.expand <- waiver()
+  }
+  x.breaks = df[,dimension]
   if (!is.null(dim_breaks)) {
     x.breaks = unique(df[,dimension])[dim_breaks]
-    gg <- gg + scale_x_discrete(breaks = x.breaks, drop = FALSE)
     df[!(df[, dimension] %in% x.breaks), 'measure_label'] <- NA
   }
-  y.breaks = y.labels = waiver()
+  gg <- gg + scale_x_discrete(breaks = x.breaks, drop = FALSE, expand = x.expand)
+  y.labels = y.breaks = waiver()
   y.expand <- expand_scale(mult = c(0.05, 0.05))
   if (!is.null(measure_unit)) {
     if (measure_unit == '%') y.labels = scales::percent
@@ -329,8 +345,9 @@ quik_points = function(df, dimension, measure, groups = NULL, palette_type = 'qu
 #'
 #' @usage quik_bullets(df, group_col, range_low, range_high, bar_fill = NULL,
 #'                      dotted_line = NULL, solid_line = NULL, text_size = 3,
-#'                      palette_type = 'qualitative', line_colors = "Purple", fill_color = NULL,
-#'                      currency = NULL, measure_unit = NULL, measure_decimal = 0, ...)
+#'                      palette_type = 'qualitative', line_colors = "Purple", 
+#'                      fill_color = NULL, currency = NULL, 
+#'                      measure_unit = NULL, measure_decimal = 0, ...)
 #'                         
 #' @examples
 #' # load a sample data frame

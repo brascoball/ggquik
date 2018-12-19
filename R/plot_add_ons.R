@@ -94,7 +94,7 @@ add_backbar = function(gg, measure, bg_color = "Gray 4", width = 0.65) {
 #' @param text_size The backtext size. Default is \code{3}.
 #' @param vertical_adjust The text vertical adjustment. Default is \code{-0.5}.
 #'
-#' @usage add_backtext(gg, measure, text_size = 3)
+#' @usage add_backtext(gg, measure, text_size = 3, vertical_adjust = -0.5)
 #'
 #' @export
 add_backtext = function(gg, measure, text_size = 3, vertical_adjust = -0.5) {
